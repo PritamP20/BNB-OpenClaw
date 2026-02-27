@@ -4,34 +4,41 @@ import type { PublicClient, AbiEvent } from "viem";
  * Fetches event logs across an arbitrary block range by splitting the query
  * into chunks of `chunkSize` blocks (default 49,000, safely under the 50,000
  * limit imposed by most BSC public RPC endpoints).
+ *
+ * `address` is optional — omit it to scan all contracts (useful for discovering
+ * a bonding curve via its CurveInitialized event filtered by indexed token arg).
+ * `args` can filter indexed event parameters in the same way viem's getLogs does.
  */
 export async function fetchAllLogs<TAbiEvent extends AbiEvent>({
   client,
   address,
   event,
+  args,
   fromBlock,
   toBlock,
   chunkSize = 49_000n,
 }: {
   client: PublicClient;
-  address: `0x${string}`;
+  address?: `0x${string}`;
   event: TAbiEvent;
+  args?: Record<string, unknown>;
   fromBlock: bigint;
   toBlock?: bigint;
   chunkSize?: bigint;
 }) {
   const latestBlock = toBlock ?? (await client.getBlockNumber());
 
-  const allLogs: Awaited<ReturnType<typeof client.getLogs>>= [];
+  const allLogs: Awaited<ReturnType<typeof client.getLogs>> = [];
 
   for (let start = fromBlock; start <= latestBlock; start += chunkSize) {
     const end = start + chunkSize - 1n < latestBlock ? start + chunkSize - 1n : latestBlock;
     const chunk = await client.getLogs({
-      address,
+      ...(address ? { address } : {}),
       event,
+      ...(args ? { args } : {}),
       fromBlock: start,
       toBlock:   end,
-    });
+    } as any);
     allLogs.push(...(chunk as any));
   }
 

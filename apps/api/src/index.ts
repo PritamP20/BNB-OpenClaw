@@ -5,6 +5,7 @@ import { config } from "./config";
 import { migrate } from "./db/client";
 import { agentsRouter } from "./routes/agents";
 import { proxyRouter }  from "./routes/proxy";
+import { chatRouter }   from "./routes/chat";
 import { logger } from "./lib/logger";
 
 const app = express();
@@ -29,6 +30,9 @@ app.get("/health", (_req, res) => {
 
 // Agent management API
 app.use("/api/agents", agentsRouter);
+
+// AI Chat (token-gated)
+app.use("/api/chat", chatRouter);
 
 // Token-gated proxy  →  /agent/:agentId/<any path>
 app.use("/agent", proxyRouter);

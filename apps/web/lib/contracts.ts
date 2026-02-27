@@ -42,6 +42,7 @@ export const BONDING_CURVE_ABI = [
   { name: "buy", type: "function", stateMutability: "payable", inputs: [{ name: "minTokenOut", type: "uint256" }], outputs: [] },
   { name: "sell", type: "function", stateMutability: "nonpayable", inputs: [{ name: "tokenAmount", type: "uint256" }, { name: "minBNBOut", type: "uint256" }], outputs: [] },
   // Events
+  { name: "CurveInitialized", type: "event", inputs: [{ name: "token", type: "address", indexed: true }, { name: "tokenSupply", type: "uint256" }, { name: "virtualBNB", type: "uint256" }] },
   { name: "Buy", type: "event", inputs: [{ name: "buyer", type: "address", indexed: true }, { name: "bnbPaid", type: "uint256" }, { name: "bnbNet", type: "uint256" }, { name: "tokensOut", type: "uint256" }, { name: "fee", type: "uint256" }, { name: "priceAfter", type: "uint256" }] },
   { name: "Sell", type: "event", inputs: [{ name: "seller", type: "address", indexed: true }, { name: "tokensIn", type: "uint256" }, { name: "bnbGross", type: "uint256" }, { name: "bnbNet", type: "uint256" }, { name: "fee", type: "uint256" }, { name: "priceAfter", type: "uint256" }] },
   { name: "Graduated", type: "event", inputs: [{ name: "token", type: "address", indexed: true }, { name: "bnbRaised", type: "uint256" }, { name: "tokensRemaining", type: "uint256" }] },
@@ -133,4 +134,39 @@ export const ERC20_ABI = [
   { name: "allowance", type: "function", stateMutability: "view", inputs: [{ name: "owner", type: "address" }, { name: "spender", type: "address" }], outputs: [{ name: "", type: "uint256" }] },
   { name: "approve", type: "function", stateMutability: "nonpayable", inputs: [{ name: "spender", type: "address" }, { name: "amount", type: "uint256" }], outputs: [{ name: "", type: "bool" }] },
   { name: "decimals", type: "function", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint8" }] },
+] as const;
+
+// ── AgentRegistry ABI (minimal) ───────────────────────────────────────────────
+
+export const AGENT_REGISTRY_ABI = [
+  {
+    name: "getAgentRecord",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "agentId", type: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple",
+        components: [
+          { name: "agentId",     type: "uint256"   },
+          { name: "owner",       type: "address"   },
+          { name: "agentToken",  type: "address"   },
+          { name: "skillTokens", type: "address[]" },
+          { name: "metadata",    type: "string"    },
+          { name: "createdAt",   type: "uint256"   },
+        ],
+      },
+    ],
+  },
+  {
+    name: "registerAgent",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "agentToken", type: "address" },
+      { name: "metadata",   type: "string"  },
+    ],
+    outputs: [{ name: "agentId", type: "uint256" }],
+  },
 ] as const;

@@ -31,6 +31,9 @@ import {
   RefreshCw,
   Search,
   X,
+  FileText,
+  Upload,
+  FileCheck,
 } from "lucide-react";
 import { useTokens, type Token } from "../hooks/useTokens";
 
@@ -814,6 +817,35 @@ export function LaunchForm() {
   // Track the full selected-agent object for a preview card
   const [selectedAgent, setSelectedAgent] = useState<Token | null>(null);
 
+  // Skill spec file state
+  const [skillSpecFile, setSkillSpecFile] = useState<{ name: string; raw: string } | null>(null);
+  const [skillSpecError, setSkillSpecError] = useState("");
+  const skillFileRef = useRef<HTMLInputElement>(null);
+
+  const handleSkillSpecFile = (file: File) => {
+    setSkillSpecError("");
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const raw = (ev.target?.result as string) ?? "";
+      setSkillSpecFile({ name: file.name, raw });
+
+      // Try to parse as JSON and auto-fill fields
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed.skillId)     set("skillId",     String(parsed.skillId).toUpperCase().replace(/\s+/g, "_"));
+        if (parsed.name)        set("name",        String(parsed.name));
+        if (parsed.symbol)      set("symbol",      String(parsed.symbol).toUpperCase());
+        if (parsed.description) set("description", String(parsed.description));
+        if (parsed.costPerUse)  set("costPerUse",  String(parsed.costPerUse));
+      } catch {
+        // Plain-text: use as description if description is empty
+        if (!form.description.trim()) set("description", raw.slice(0, 280));
+      }
+    };
+    reader.onerror = () => setSkillSpecError("Failed to read file.");
+    reader.readAsText(file);
+  };
+
   // Deployment polling state (agent type — Docker build on CreateOS)
   const [deployingAgentId,   setDeployingAgentId]   = useState<string | null>(null);
   const [deploymentStatus,   setDeploymentStatus]   = useState<string>("pending");
@@ -1273,6 +1305,77 @@ export function LaunchForm() {
                     <X size={12} />
                   </button>
                 </div>
+              )}
+
+              {/* ── Skill Specification File Upload ── */}
+              <div
+                className={`relative rounded-xl border-2 border-dashed transition-colors ${
+                  skillSpecFile
+                    ? "border-green-500/40 bg-green-500/5"
+                    : "border-bnb-border hover:border-bnb-yellow/40 bg-black/20"
+                }`}
+                onDragOver={(e) => { e.preventDefault(); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files[0];
+                  if (file) handleSkillSpecFile(file);
+                }}
+              >
+                <input
+                  ref={skillFileRef}
+                  type="file"
+                  accept=".txt,.json,.md,.yaml,.yml"
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleSkillSpecFile(file);
+                    e.target.value = "";
+                  }}
+                />
+
+                {skillSpecFile ? (
+                  <div className="flex items-start gap-3 p-4">
+                    <FileCheck size={20} className="mt-0.5 flex-shrink-0 text-green-400" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-white">{skillSpecFile.name}</p>
+                      <p className="mt-0.5 line-clamp-2 font-mono text-[11px] text-gray-500">
+                        {skillSpecFile.raw.slice(0, 120)}{skillSpecFile.raw.length > 120 ? "…" : ""}
+                      </p>
+                      <p className="mt-1 text-[10px] text-green-400">Fields auto-filled from spec ↑</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setSkillSpecFile(null); setSkillSpecError(""); }}
+                      className="flex-shrink-0 rounded-lg border border-bnb-border p-1.5 text-gray-600 hover:text-white transition-colors"
+                    >
+                      <X size={11} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 py-6 text-center">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bnb-border bg-bnb-dark">
+                      <Upload size={16} className="text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-300">
+                        Attach skill specification
+                      </p>
+                      <p className="mt-0.5 text-xs text-gray-600">
+                        Drop a <span className="text-gray-500">.txt / .json / .md</span> file — fields will be auto-filled
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => skillFileRef.current?.click()}
+                      className="mt-1 flex items-center gap-1.5 rounded-lg border border-bnb-border bg-bnb-card px-3 py-1.5 text-xs text-gray-400 hover:border-white/20 hover:text-white transition-colors"
+                    >
+                      <FileText size={11} /> Browse files
+                    </button>
+                  </div>
+                )}
+              </div>
+              {skillSpecError && (
+                <p className="-mt-2 text-xs text-red-400">{skillSpecError}</p>
               )}
 
               {/* No agents yet CTA */}

@@ -226,7 +226,7 @@ function BondingCurveBar({
 
 function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: string }) {
   const [tab, setTab] = useState<"trades" | "info">("trades");
-  const { trades, loading, fetched } = useTrades(token.curveAddress);
+  const { trades, loading, fetched, curveFound } = useTrades(token.address);
 
   return (
     <div className="rounded-2xl border border-bnb-border bg-bnb-card">
@@ -258,8 +258,8 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
             </div>
           )}
 
-          {/* No curve (MOCK) */}
-          {fetched && !loading && !token.curveAddress && (
+          {/* No curve found on-chain */}
+          {fetched && !loading && !curveFound && (
             <div className="flex flex-col items-center gap-2 py-10 text-center">
               <Activity size={24} className="text-gray-700" />
               <p className="text-sm font-medium text-gray-500">No trades yet</p>
@@ -268,7 +268,7 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
           )}
 
           {/* Real curve, zero events */}
-          {fetched && !loading && token.curveAddress && trades.length === 0 && (
+          {fetched && !loading && curveFound && trades.length === 0 && (
             <div className="flex flex-col items-center gap-2 py-10 text-center">
               <Activity size={24} className="text-gray-700" />
               <p className="text-sm font-medium text-gray-500">No trades yet</p>

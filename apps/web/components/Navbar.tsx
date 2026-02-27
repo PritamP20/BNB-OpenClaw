@@ -18,13 +18,14 @@ import { injected } from "wagmi/connectors";
 import { bscTestnet } from "wagmi/chains";
 import {
   Zap, Rocket, BarChart2, Menu, X,
-  AlertTriangle, Loader2, ChevronDown,
+  AlertTriangle, Loader2, ChevronDown, MessageSquare,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const navLinks = [
-  { href: "/",       label: "Explore", icon: BarChart2 },
-  { href: "/launch", label: "Launch",  icon: Rocket    },
+  { href: "/",       label: "Explore", icon: BarChart2     },
+  { href: "/launch", label: "Launch",  icon: Rocket        },
+  { href: "/chat",   label: "Chat",    icon: MessageSquare },
 ];
 
 export function Navbar() {

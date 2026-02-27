@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePublicClient } from "wagmi";
 import { bscTestnet } from "wagmi/chains";
 import { formatEther } from "viem";
-import { BONDING_CURVE_ABI } from "../lib/contracts";
+import { BONDING_CURVE_ABI, ADDRESSES } from "../lib/contracts";
 import { fetchAllLogs } from "../lib/fetchLogs";
 import type { ChartPoint, TimeRange } from "../lib/chart-data";
 import { BNB_USD } from "../lib/chart-data";
@@ -20,8 +20,9 @@ const RANGE_MS: Record<TimeRange, number> = {
   "ALL": Infinity,
 };
 
-const BUY_EVENT  = BONDING_CURVE_ABI.find((x) => x.name === "Buy"  && x.type === "event")!;
-const SELL_EVENT = BONDING_CURVE_ABI.find((x) => x.name === "Sell" && x.type === "event")!;
+const CURVE_INIT_EVENT = BONDING_CURVE_ABI.find((x) => x.name === "CurveInitialized" && x.type === "event")!;
+const BUY_EVENT        = BONDING_CURVE_ABI.find((x) => x.name === "Buy"              && x.type === "event")!;
+const SELL_EVENT       = BONDING_CURVE_ABI.find((x) => x.name === "Sell"             && x.type === "event")!;
 
 export interface RawChartEvent {
   ts:            number;          // estimated unix ms
@@ -106,27 +107,64 @@ export function buildChartPoints(
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
-export function useChartData(curveAddress: `0x${string}` | undefined) {
+/**
+ * Accepts the ERC-20 token address. Internally:
+ *  1. Scans CurveInitialized(token indexed) events across all contracts to find
+ *     the bonding curve that was created for this token.
+ *  2. Fetches Buy + Sell events from that curve.
+ *
+ * Falls back gracefully when no curve exists (mock tokens, un-deployed tokens).
+ */
+export function useChartData(tokenAddress: `0x${string}` | undefined) {
   const publicClient = usePublicClient({ chainId: bscTestnet.id });
   const [events,  setEvents]  = useState<RawChartEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(false);
+  const [curveFound, setCurveFound] = useState<`0x${string}` | null>(null);
 
   useEffect(() => {
-    if (!publicClient || !curveAddress) {
+    if (!publicClient || !tokenAddress) {
       setFetched(true);
       return;
     }
 
     let cancelled = false;
     setLoading(true);
+    setEvents([]);
+    setCurveFound(null);
+    setFetched(false);
 
     (async () => {
       try {
+        // ── Step 1: discover the bonding curve via CurveInitialized ──────────
+        // CurveInitialized(address indexed token, uint256 tokenSupply, uint256 virtualBNB)
+        // `token` is indexed → we can filter by it across all addresses.
+        const initLogs = await fetchAllLogs({
+          client: publicClient,
+          address: undefined as any,          // no specific contract — scan all
+          event: CURVE_INIT_EVENT as never,
+          args: { token: tokenAddress } as any,
+          fromBlock: ADDRESSES.startBlock,
+        });
+
+        if (cancelled) return;
+
+        if (initLogs.length === 0) {
+          // No curve found → token has no bonding curve
+          setFetched(true);
+          setLoading(false);
+          return;
+        }
+
+        // The emitting contract address IS the bonding curve
+        const curveAddress = (initLogs[0] as any).address as `0x${string}`;
+        setCurveFound(curveAddress);
+
+        // ── Step 2: fetch Buy + Sell events from that curve ──────────────────
         const [latestBlock, buyLogs, sellLogs] = await Promise.all([
           publicClient.getBlockNumber(),
-          fetchAllLogs({ client: publicClient, address: curveAddress, event: BUY_EVENT  as never, fromBlock: 0n }),
-          fetchAllLogs({ client: publicClient, address: curveAddress, event: SELL_EVENT as never, fromBlock: 0n }),
+          fetchAllLogs({ client: publicClient, address: curveAddress, event: BUY_EVENT  as never, fromBlock: ADDRESSES.startBlock }),
+          fetchAllLogs({ client: publicClient, address: curveAddress, event: SELL_EVENT as never, fromBlock: ADDRESSES.startBlock }),
         ]);
 
         if (cancelled) return;
@@ -152,9 +190,7 @@ export function useChartData(curveAddress: `0x${string}` | undefined) {
           })),
         ];
 
-        // Sort oldest → newest
         mapped.sort((a, b) => Number(a.blockNumber - b.blockNumber));
-
         setEvents(mapped);
       } catch (e) {
         console.error("useChartData: failed to fetch chart events", e);
@@ -167,7 +203,7 @@ export function useChartData(curveAddress: `0x${string}` | undefined) {
     })();
 
     return () => { cancelled = true; };
-  }, [curveAddress, publicClient]);
+  }, [tokenAddress, publicClient]);
 
-  return { events, loading, fetched };
+  return { events, loading, fetched, curveFound };
 }

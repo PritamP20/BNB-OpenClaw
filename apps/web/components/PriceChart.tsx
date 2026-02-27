@@ -80,17 +80,18 @@ function VolumeTooltip({ active, payload }: { active?: boolean; payload?: Array<
 export function PriceChart({ token }: { token: MockToken }) {
   const [range, setRange] = useState<TimeRange>("24H");
 
-  // Fetch real on-chain Buy/Sell events when a bonding curve exists
-  const curveAddress = (token as any).curveAddress as `0x${string}` | undefined;
-  const { events, loading, fetched } = useChartData(curveAddress);
-  const hasCurve = Boolean(curveAddress);
+  // useChartData discovers the curve from CurveInitialized logs, then fetches trades
+  const tokenAddress = (token as any).address as `0x${string}` | undefined;
+  const { events, loading, fetched, curveFound } = useChartData(tokenAddress);
 
-  // Real data when curve present + fetched; mock fallback for non-deployed tokens
+  // Real data when we've fetched (regardless of whether a curve was found);
+  // mock fallback only when there's no on-chain token address at all.
   const data = useMemo(() => {
-    if (hasCurve && fetched) return buildChartPoints(events, range);
-    if (!hasCurve)           return generatePriceHistory(token, range);
+    if (fetched && curveFound) return buildChartPoints(events, range);
+    if (fetched && !curveFound && tokenAddress) return [];   // real token, no curve yet
+    if (!tokenAddress)                          return generatePriceHistory(token, range);
     return [];
-  }, [hasCurve, fetched, events, range, token]);
+  }, [fetched, curveFound, events, range, token, tokenAddress]);
 
   const stats = useMemo(() => compute24hStats(data), [data]);
 
@@ -103,7 +104,7 @@ export function PriceChart({ token }: { token: MockToken }) {
   const maxPrice = prices.length ? Math.max(...prices) * 1.03 : 1;
 
   // ── Loading state ──────────────────────────────────────────────────────────
-  if (hasCurve && loading && !fetched) {
+  if (tokenAddress && loading && !fetched) {
     return (
       <div className="flex h-80 items-center justify-center gap-3 text-gray-500">
         <Loader2 className="h-5 w-5 animate-spin text-bnb-yellow" />
@@ -112,8 +113,8 @@ export function PriceChart({ token }: { token: MockToken }) {
     );
   }
 
-  // ── Empty state (curve exists but no trades yet) ───────────────────────────
-  if (hasCurve && fetched && data.length === 0) {
+  // ── Empty state (token on-chain, curve found, but no trades yet) ───────────
+  if (tokenAddress && fetched && curveFound && data.length === 0) {
     return (
       <div className="flex h-80 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-bnb-border text-center">
         <TrendingUp className="h-8 w-8 text-bnb-yellow/50" />
