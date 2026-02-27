@@ -1,24 +1,21 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #0e0e11;
+  --foreground: #ffffff;
+  --card: #16161a;
+  --border: #2a2a35;
+  --bnb-yellow: #F3BA2F;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-}
-
-body {
+  background-color: var(--background);
   color: var(--foreground);
-  background: var(--background);
 }
 
 * {
@@ -32,19 +29,34 @@ a {
   text-decoration: none;
 }
 
-.imgDark {
-  display: none;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a4a;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* Custom utilities */
+@layer utilities {
+  .text-bnb-yellow {
+    color: var(--bnb-yellow);
   }
-
-  .imgLight {
-    display: none;
+  .bg-bnb-yellow {
+    background-color: var(--bnb-yellow);
   }
-  .imgDark {
-    display: unset;
+  .border-bnb-yellow {
+    border-color: var(--bnb-yellow);
+  }
+  .glow-yellow {
+    box-shadow: 0 0 20px rgba(243, 186, 47, 0.15);
   }
 }
