@@ -6,6 +6,7 @@ import { bscTestnet } from "wagmi/chains";
 import { formatEther } from "viem";
 import { BONDING_CURVE_ABI, ADDRESSES } from "../lib/contracts";
 import { fetchAllLogs } from "../lib/fetchLogs";
+import { discoverBondingCurve } from "../lib/curveDiscovery";
 
 export interface Trade {
   type: "buy" | "sell";
@@ -21,9 +22,8 @@ export interface Trade {
 // BSC produces ~3 s/block; good enough for age display
 const BSC_MS_PER_BLOCK = 3_000;
 
-const CURVE_INIT_EVENT = BONDING_CURVE_ABI.find((x) => x.name === "CurveInitialized" && x.type === "event")!;
-const BUY_EVENT        = BONDING_CURVE_ABI.find((x) => x.name === "Buy"              && x.type === "event")!;
-const SELL_EVENT       = BONDING_CURVE_ABI.find((x) => x.name === "Sell"             && x.type === "event")!;
+const BUY_EVENT  = BONDING_CURVE_ABI.find((x) => x.name === "Buy"  && x.type === "event")!;
+const SELL_EVENT = BONDING_CURVE_ABI.find((x) => x.name === "Sell" && x.type === "event")!;
 
 /**
  * Fetch real on-chain Buy/Sell events for a token.
@@ -51,24 +51,19 @@ export function useTrades(tokenAddress: `0x${string}` | undefined) {
 
     (async () => {
       try {
-        // ── Step 1: discover the bonding curve ───────────────────────────────
-        const initLogs = await fetchAllLogs({
-          client: publicClient,
-          event: CURVE_INIT_EVENT as never,
-          args: { token: tokenAddress } as any,
-          fromBlock: ADDRESSES.startBlock,
-        });
+        // ── Step 1: discover the bonding curve via Transfer events ──────────────
+        // Scans Transfer events on the token contract (address known → RPC allows it),
+        // then verifies candidates via initialized() + token() view calls.
+        const curveAddress = await discoverBondingCurve(publicClient, tokenAddress);
 
         if (cancelled) return;
 
-        if (initLogs.length === 0) {
-          // No bonding curve for this token
+        if (!curveAddress) {
           setFetched(true);
           setLoading(false);
           return;
         }
 
-        const curveAddress = (initLogs[0] as any).address as `0x${string}`;
         setCurveFound(curveAddress);
 
         // ── Step 2: fetch all Buy + Sell events from that curve ───────────────

@@ -57,7 +57,10 @@ const TRANSFER_EVENT = {
 const GRADUATION_TARGET_WEI = BigInt(69) * BigInt(1e18);
 import { fmtUSD, BNB_USD } from "../../../lib/chart-data";
 import { fetchAllLogs } from "../../../lib/fetchLogs";
+import { discoverBondingCurve } from "../../../lib/curveDiscovery";
 import { useTrades } from "../../../hooks/useTrades";
+import { useChartData } from "../../../hooks/useChartData";
+import { useLiveBNBPrice } from "../../../hooks/useLiveBNBPrice";
 
 // ── Type config ───────────────────────────────────────────────────────────────
 
@@ -384,7 +387,12 @@ function InfoRow({ label, children }: { label: string; children: React.ReactNode
 
 export function TokenDetailClient({ token }: { token: Token }) {
   const shortAddr = `${token.address.slice(0, 8)}…${token.address.slice(-6)}`;
-  const isUp = token.priceChange24h >= 0;
+
+  // ── Live BNB/USD price (Binance, refreshes every 30s) ──────────────────────
+  const liveBNBUSD = useLiveBNBPrice();
+
+  // ── Chart events for volume + priceChange computation ───────────────────
+  const { events: chartEvents } = useChartData(token.address as `0x${string}`);
 
   // ── On-chain metadata hydration ───────────────────────────────────────────
   // Reads name/symbol/totalSupply from ERC-20, then probes agentId/skillId
@@ -393,6 +401,27 @@ export function TokenDetailClient({ token }: { token: Token }) {
   // ── Holders count from Transfer events ───────────────────────────────────
   const publicClient = usePublicClient({ chainId: bscTestnet.id });
   const [holders, setHolders] = useState<number | null>(null);
+
+  // ── Discover bonding curve address ───────────────────────────────────────
+  const [curveAddress, setCurveAddress] = useState<`0x${string}` | undefined>(
+    token.curveAddress
+  );
+  const [curveLoading, setCurveLoading] = useState(!token.curveAddress);
+
+  useEffect(() => {
+    // token.curveAddress is never populated by useTokens events — discover it
+    if (!publicClient) return;
+    let cancelled = false;
+    setCurveLoading(true);
+    discoverBondingCurve(publicClient, token.address as `0x${string}`).then((addr) => {
+      if (cancelled) return;
+      if (addr) setCurveAddress(addr);
+      setCurveLoading(false);
+    }).catch(() => {
+      if (!cancelled) setCurveLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [token.address, publicClient]);
 
   useEffect(() => {
     if (!publicClient) return;
@@ -488,31 +517,31 @@ export function TokenDetailClient({ token }: { token: Token }) {
   // ── Live on-chain reads (when curveAddress is available) ──────────────────
 
   const { data: liveProgress } = useReadContract({
-    address: token.curveAddress,
+    address: curveAddress,
     abi: BONDING_CURVE_ABI,
     functionName: "graduationProgress",
-    query: { enabled: !!token.curveAddress, refetchInterval: 30_000 },
+    query: { enabled: !!curveAddress, refetchInterval: 30_000 },
   });
 
   const { data: liveBNBRaised } = useReadContract({
-    address: token.curveAddress,
+    address: curveAddress,
     abi: BONDING_CURVE_ABI,
     functionName: "bnbRaised",
-    query: { enabled: !!token.curveAddress, refetchInterval: 30_000 },
+    query: { enabled: !!curveAddress, refetchInterval: 30_000 },
   });
 
   const { data: livePrice } = useReadContract({
-    address: token.curveAddress,
+    address: curveAddress,
     abi: BONDING_CURVE_ABI,
     functionName: "getPrice",
-    query: { enabled: !!token.curveAddress, refetchInterval: 30_000 },
+    query: { enabled: !!curveAddress, refetchInterval: 30_000 },
   });
 
   const { data: liveGraduated } = useReadContract({
-    address: token.curveAddress,
+    address: curveAddress,
     abi: BONDING_CURVE_ABI,
     functionName: "graduated",
-    query: { enabled: !!token.curveAddress },
+    query: { enabled: !!curveAddress },
   });
 
   // Merge live curve data with snapshot/chain fallbacks
@@ -526,7 +555,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
     ? Number(chainLaunchTime) * 1000   // unix → ms
     : token.createdAt;
   const finalMarketCap = chainSupply != null && finalPrice > 0
-    ? Number(formatEther(chainSupply)) * finalPrice * BNB_USD
+    ? Number(formatEther(chainSupply)) * finalPrice * liveBNBUSD
     : token.marketCap;
 
   // Live token for sub-components (merge all on-chain data)
@@ -545,6 +574,30 @@ export function TokenDetailClient({ token }: { token: Token }) {
     holders: holders ?? token.holders,
     createdAt: finalCreatedAt,
   };
+
+  // ── Compute real 24h stats from on-chain chart events ───────────────────
+  const MS_24H = 86_400_000;
+  const now24 = Date.now();
+
+  // Volume = sum of BNB in all trades in last 24h × live BNB/USD
+  const liveVolume24h = chartEvents
+    .filter((e) => e.ts >= now24 - MS_24H)
+    .reduce((s, e) => s + e.bnbAmount * liveBNBUSD, 0);
+
+  // priceChange = (currentPrice - price24hAgo) / price24hAgo × 100
+  // price24hAgo = priceAfter of the last event that occurred before the 24h window
+  const sortedEvents = [...chartEvents].sort((a, b) => a.ts - b.ts);
+  const eventsBefore24h = sortedEvents.filter((e) => e.ts < now24 - MS_24H);
+  const price24hAgo = eventsBefore24h.length > 0
+    ? eventsBefore24h[eventsBefore24h.length - 1]!.priceAfterBNB
+    : sortedEvents.length > 0
+      ? sortedEvents[0]!.priceAfterBNB
+      : finalPrice;
+  const livePriceChange24h = price24hAgo > 0 && finalPrice > 0
+    ? ((finalPrice - price24hAgo) / price24hAgo) * 100
+    : 0;
+
+  const isUp = livePriceChange24h >= 0;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
@@ -576,7 +629,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
                   GRADUATED
                 </span>
               )}
-              {!token.curveAddress && (
+              {!curveAddress && (
                 <span className="rounded-md bg-bnb-yellow/10 px-2 py-0.5 text-[10px] font-medium text-bnb-yellow/70">
                   MOCK
                 </span>
@@ -603,32 +656,32 @@ export function TokenDetailClient({ token }: { token: Token }) {
         {/* Price + change */}
         <div className="flex flex-col items-end gap-1">
           <p className="font-mono text-3xl font-extrabold text-white">
-            {fmtUSD(finalPrice * BNB_USD)}
+            {fmtUSD(finalPrice * liveBNBUSD)}
           </p>
           <p className="font-mono text-xs text-gray-600">
             {finalPrice.toFixed(10)} BNB
           </p>
           <div className={`flex items-center gap-1 text-sm font-semibold ${isUp ? "text-green-400" : "text-red-400"}`}>
             {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-            {isUp ? "+" : ""}{token.priceChange24h.toFixed(2)}% (24h)
+            {isUp ? "+" : ""}{livePriceChange24h.toFixed(2)}% (24h)
           </div>
         </div>
       </div>
 
       {/* ── Quick stats strip ────────────────────────────────────────────────── */}
       <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatPill label="Market Cap" value={fmtUSD(token.marketCap, true)} />
-        <StatPill label="24h Volume" value={fmtUSD(token.volume24h, true)} />
+        <StatPill label="Market Cap" value={fmtUSD(liveToken.marketCap, true)} />
+        <StatPill label="24h Volume" value={fmtUSD(liveVolume24h, true)} />
         <StatPill
           label="Holders"
-          value={token.holders.toLocaleString()}
+          value={(holders ?? liveToken.holders).toLocaleString()}
         />
         <StatPill
           label="Rep Score"
-          value={`${token.reputationScore}/100`}
+          value={`${liveToken.reputationScore}/100`}
           accent={
-            token.reputationScore >= 75 ? "text-green-400"
-              : token.reputationScore >= 50 ? "text-bnb-yellow"
+            liveToken.reputationScore >= 75 ? "text-green-400"
+              : liveToken.reputationScore >= 50 ? "text-bnb-yellow"
                 : "text-red-400"
           }
         />
@@ -674,7 +727,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
 
         {/* ── Right: buy/sell (sticky) ───────────────────────────────────────── */}
         <div className="flex flex-col gap-5 lg:self-start lg:sticky lg:top-20">
-          <BuySellPanel token={liveToken} curveAddress={token.curveAddress} />
+          <BuySellPanel token={liveToken} curveAddress={curveAddress} curveLoading={curveLoading} />
 
           {/* Mini token info card */}
           <div className="rounded-2xl border border-bnb-border bg-bnb-card p-4 flex flex-col gap-2.5 text-xs">

@@ -14,20 +14,25 @@ import { parseEther, formatEther } from "viem";
 import { ArrowUpRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Token } from "../hooks/useTokens";
 import { BONDING_CURVE_ABI } from "../lib/contracts";
-import { fmtUSD, BNB_USD } from "../lib/chart-data";
+import { fmtUSD } from "../lib/chart-data";
+import { useLiveBNBPrice } from "../hooks/useLiveBNBPrice";
 
 interface Props {
   token: Token;
-  /** BondingCurve contract address — undefined until contracts are deployed */
+  /** BondingCurve contract address — undefined until discovered */
   curveAddress?: `0x${string}`;
+  /** True while the curve address is still being discovered on-chain */
+  curveLoading?: boolean;
 }
 
 const PRESETS = ["0.1", "0.5", "1", "5"];
 
-export function BuySellPanel({ token, curveAddress }: Props) {
+export function BuySellPanel({ token, curveAddress, curveLoading = false }: Props) {
   const [tab, setTab] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const [simulating, setSimulating] = useState(false);
+
+  const BNB_USD = useLiveBNBPrice();
 
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
@@ -77,7 +82,7 @@ export function BuySellPanel({ token, curveAddress }: Props) {
 
   const { writeContract, data: txHash, isPending, error: writeError, reset } = useWriteContract();
 
-  const { isLoading: isConfirming, isSuccess: txSuccess } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess: txSuccess, error: receiptError } = useWaitForTransactionReceipt({
     hash: txHash,
   });
 
@@ -94,6 +99,8 @@ export function BuySellPanel({ token, curveAddress }: Props) {
       return;
     }
     if (!amount || bnbAmt <= 0) return;
+    // Never simulate if we're still discovering the curve
+    if (curveLoading) return;
 
     if (curveAddress) {
       // Real contract call
@@ -102,7 +109,7 @@ export function BuySellPanel({ token, curveAddress }: Props) {
           address: curveAddress,
           abi: BONDING_CURVE_ABI,
           functionName: "buy",
-          args: [0n], // minTokenOut = 0 (1% slippage buffer handled by user)
+          args: [0n],
           value: parseEther(amount),
         });
       } else {
@@ -110,11 +117,11 @@ export function BuySellPanel({ token, curveAddress }: Props) {
           address: curveAddress,
           abi: BONDING_CURVE_ABI,
           functionName: "sell",
-          args: [parseEther(amount), 0n], // amount in tokens, minBNBOut = 0
+          args: [parseEther(amount), 0n],
         });
       }
     } else {
-      // Simulate (no contract deployed yet)
+      // Curve confirmed not found — simulate
       setSimulating(true);
       await new Promise((r) => setTimeout(r, 1400));
       setSimulating(false);
@@ -123,6 +130,8 @@ export function BuySellPanel({ token, curveAddress }: Props) {
   };
 
   const isLoading = isPending || isConfirming || simulating;
+
+  const displayError = writeError || receiptError;
 
   if (token.isGraduated) {
     return (
@@ -249,10 +258,10 @@ export function BuySellPanel({ token, curveAddress }: Props) {
         )}
 
         {/* Error */}
-        {writeError && (
+        {displayError && (
           <div className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/5 px-3 py-2.5 text-xs text-red-400">
             <AlertCircle size={13} className="mt-0.5 flex-shrink-0" />
-            <span>{(writeError as { shortMessage?: string }).shortMessage ?? writeError.message}</span>
+            <span>{(displayError as { shortMessage?: string }).shortMessage ?? (displayError as Error).message}</span>
           </div>
         )}
 
@@ -267,13 +276,15 @@ export function BuySellPanel({ token, curveAddress }: Props) {
         {/* CTA */}
         <button
           onClick={handleAction}
-          disabled={isLoading || (isConnected && (!amount || bnbAmt <= 0))}
+          disabled={isLoading || curveLoading || (isConnected && (!amount || bnbAmt <= 0))}
           className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all disabled:opacity-50 ${tab === "buy"
               ? "bg-green-500 text-white hover:bg-green-400 shadow-lg shadow-green-500/20"
               : "bg-red-500 text-white hover:bg-red-400 shadow-lg shadow-red-500/20"
             }`}
         >
-          {isLoading ? (
+          {curveLoading ? (
+            <><Loader2 size={15} className="animate-spin" /> Finding curve…</>
+          ) : isLoading ? (
             <><Loader2 size={15} className="animate-spin" /> {isConfirming ? "Confirming…" : "Processing…"}</>
           ) : !isConnected ? (
             "Connect Wallet"

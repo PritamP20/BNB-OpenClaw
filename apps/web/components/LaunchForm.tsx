@@ -349,6 +349,23 @@ function validate(form: FormState, type: TokenType): Errors {
   if (!form.supply || Number(form.supply) <= 0)
     e.supply = "Supply must be greater than 0.";
 
+  if (type === "normal") {
+    const cap = Number(form.maxSupply ?? 0);
+    const sup = Number(form.supply ?? 0);
+    if (cap < 0)
+      e.maxSupply = "Max supply cannot be negative.";
+    else if (cap > 0 && sup > 0 && cap < sup)
+      e.maxSupply = `Cap (${cap.toLocaleString()}) must be ≥ Total Supply (${sup.toLocaleString()}), or set to 0 for uncapped.`;
+
+    if (!form.virtualBNB || Number(form.virtualBNB) <= 0)
+      e.virtualBNB = "Virtual BNB must be greater than 0.";
+    if (!form.graduationTarget || Number(form.graduationTarget) <= 0)
+      e.graduationTarget = "Graduation target must be greater than 0.";
+    const fee = Number(form.feeBps);
+    if (isNaN(fee) || fee < 0 || fee > 500)
+      e.feeBps = "Fee must be 0–500 bps (max 5%).";
+  }
+
   if (type === "agent") {
     if (!form.virtualBNB || Number(form.virtualBNB) <= 0)
       e.virtualBNB = "Virtual BNB must be greater than 0.";
@@ -700,10 +717,11 @@ function DeployingScreen({
 // ── Success Screen ────────────────────────────────────────────────────────────
 
 function SuccessScreen({
-  type, name, symbol, avatar, agentId, tokenAddress, txHash, onReset,
+  type, name, symbol, avatar, agentId, tokenAddress, curveAddress, txHash, onReset,
 }: {
   type: TokenType; name: string; symbol: string; avatar: string;
-  agentId: string | null; tokenAddress: string | null; txHash: string | null;
+  agentId: string | null; tokenAddress: string | null;
+  curveAddress: string | null; txHash: string | null;
   onReset: () => void;
 }) {
   const displayAddr = agentId ?? tokenAddress ?? null;
@@ -743,6 +761,19 @@ function SuccessScreen({
               <button onClick={() => navigator.clipboard.writeText(displayAddr).catch(() => {})}>
                 <Copy size={12} className="cursor-pointer text-gray-500 hover:text-white" />
               </button>
+            </div>
+          </div>
+        )}
+        {curveAddress && (
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500">Bonding Curve</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs text-green-400">
+                {curveAddress.slice(0, 10)}…{curveAddress.slice(-8)}
+              </span>
+              <a href={`https://testnet.bscscan.com/address/${curveAddress}`} target="_blank" rel="noopener noreferrer">
+                <ExternalLink size={12} className="text-gray-500 hover:text-bnb-yellow" />
+              </a>
             </div>
           </div>
         )}
@@ -978,11 +1009,15 @@ export function LaunchForm() {
       });
     } else if (type === "normal") {
       await deployHook.deploy({
-        type:      "normal",
-        name:      form.name.trim(),
-        symbol:    form.symbol.trim(),
-        supply:    parseEther(form.supply || "1000000000"),
-        maxSupply: parseEther(form.maxSupply || "0"),
+        type:             "normal",
+        name:             form.name.trim(),
+        symbol:           form.symbol.trim(),
+        supply:           parseEther(form.supply || "1000000000"),
+        maxSupply:        parseEther(form.maxSupply || "0"),
+        virtualBNB:       parseEther(form.virtualBNB || "10"),
+        graduationTarget: parseEther(form.graduationTarget || "69"),
+        feeBps:           BigInt(Math.round(Number(form.feeBps) || 100)),
+        creator:          address!,
       });
     } else if (type === "skill") {
       await deployHook.deploy({
@@ -1024,6 +1059,7 @@ export function LaunchForm() {
         avatar={form.avatar}
         agentId={type === "agent" ? deployingAgentId : null}
         tokenAddress={deployHook.tokenAddress}
+        curveAddress={deployHook.curveAddress}
         txHash={deployHook.txHash}
         onReset={resetAll}
       />
@@ -1120,10 +1156,37 @@ export function LaunchForm() {
           {type === "normal" && (
             <>
               <SectionHeading n={2} label="Token Config" />
-              <Field label="Max Supply Cap" hint="Set to 0 for no cap.">
-                <input className={inputCls} type="number" placeholder="0 = uncapped"
-                  value={form.maxSupply} onChange={(e) => set("maxSupply", e.target.value)} />
+              <Field
+                label="Max Supply Cap"
+                hint={`0 = uncapped. If set, must be ≥ Total Supply (currently ${Number(form.supply || 0).toLocaleString()}).`}
+                error={errors.maxSupply}
+              >
+                <input
+                  className={errors.maxSupply ? errorInputCls : inputCls}
+                  type="number" min="0" placeholder="0 = uncapped"
+                  value={form.maxSupply}
+                  onChange={(e) => set("maxSupply", e.target.value)}
+                />
               </Field>
+
+              <SectionHeading n={3} label="Bonding Curve Config" />
+              <div className="grid grid-cols-3 gap-4">
+                <Field label="Virtual BNB" hint="Initial virtual reserve (sets starting price)." error={errors.virtualBNB}>
+                  <input className={errors.virtualBNB ? errorInputCls : inputCls}
+                    type="number" value={form.virtualBNB}
+                    onChange={(e) => set("virtualBNB", e.target.value)} />
+                </Field>
+                <Field label="Grad. Target (BNB)" hint="BNB to trigger PancakeSwap graduation." error={errors.graduationTarget}>
+                  <input className={errors.graduationTarget ? errorInputCls : inputCls}
+                    type="number" value={form.graduationTarget}
+                    onChange={(e) => set("graduationTarget", e.target.value)} />
+                </Field>
+                <Field label="Fee (bps)" hint="100 bps = 1%. Max 500." error={errors.feeBps}>
+                  <input className={errors.feeBps ? errorInputCls : inputCls}
+                    type="number" max={500} value={form.feeBps}
+                    onChange={(e) => set("feeBps", e.target.value)} />
+                </Field>
+              </div>
             </>
           )}
 

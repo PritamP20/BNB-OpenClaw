@@ -39,6 +39,7 @@ export const BONDING_CURVE_ABI = [
   { name: "getBuyQuote", type: "function", stateMutability: "view", inputs: [{ name: "bnbIn", type: "uint256" }], outputs: [{ name: "tokenOut", type: "uint256" }] },
   { name: "getSellQuote", type: "function", stateMutability: "view", inputs: [{ name: "tokenAmount", type: "uint256" }], outputs: [{ name: "bnbOut", type: "uint256" }] },
   // Writes
+  { name: "init", type: "function", stateMutability: "nonpayable", inputs: [{ name: "amount", type: "uint256" }], outputs: [] },
   { name: "buy", type: "function", stateMutability: "payable", inputs: [{ name: "minTokenOut", type: "uint256" }], outputs: [] },
   { name: "sell", type: "function", stateMutability: "nonpayable", inputs: [{ name: "tokenAmount", type: "uint256" }, { name: "minBNBOut", type: "uint256" }], outputs: [] },
   // Events

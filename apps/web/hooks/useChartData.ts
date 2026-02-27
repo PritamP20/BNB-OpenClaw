@@ -6,6 +6,7 @@ import { bscTestnet } from "wagmi/chains";
 import { formatEther } from "viem";
 import { BONDING_CURVE_ABI, ADDRESSES } from "../lib/contracts";
 import { fetchAllLogs } from "../lib/fetchLogs";
+import { discoverBondingCurve } from "../lib/curveDiscovery";
 import type { ChartPoint, TimeRange } from "../lib/chart-data";
 import { BNB_USD } from "../lib/chart-data";
 
@@ -20,9 +21,8 @@ const RANGE_MS: Record<TimeRange, number> = {
   "ALL": Infinity,
 };
 
-const CURVE_INIT_EVENT = BONDING_CURVE_ABI.find((x) => x.name === "CurveInitialized" && x.type === "event")!;
-const BUY_EVENT        = BONDING_CURVE_ABI.find((x) => x.name === "Buy"              && x.type === "event")!;
-const SELL_EVENT       = BONDING_CURVE_ABI.find((x) => x.name === "Sell"             && x.type === "event")!;
+const BUY_EVENT  = BONDING_CURVE_ABI.find((x) => x.name === "Buy"  && x.type === "event")!;
+const SELL_EVENT = BONDING_CURVE_ABI.find((x) => x.name === "Sell" && x.type === "event")!;
 
 export interface RawChartEvent {
   ts:            number;          // estimated unix ms
@@ -136,28 +136,20 @@ export function useChartData(tokenAddress: `0x${string}` | undefined) {
 
     (async () => {
       try {
-        // ── Step 1: discover the bonding curve via CurveInitialized ──────────
-        // CurveInitialized(address indexed token, uint256 tokenSupply, uint256 virtualBNB)
-        // `token` is indexed → we can filter by it across all addresses.
-        const initLogs = await fetchAllLogs({
-          client: publicClient,
-          address: undefined as any,          // no specific contract — scan all
-          event: CURVE_INIT_EVENT as never,
-          args: { token: tokenAddress } as any,
-          fromBlock: ADDRESSES.startBlock,
-        });
+        // ── Step 1: discover the bonding curve ───────────────────────────────
+        // Scans Transfer events on the token (address known → RPC allows it),
+        // then verifies candidates via initialized() + token() view calls.
+        const curveAddress = await discoverBondingCurve(publicClient, tokenAddress);
 
         if (cancelled) return;
 
-        if (initLogs.length === 0) {
+        if (!curveAddress) {
           // No curve found → token has no bonding curve
           setFetched(true);
           setLoading(false);
           return;
         }
 
-        // The emitting contract address IS the bonding curve
-        const curveAddress = (initLogs[0] as any).address as `0x${string}`;
         setCurveFound(curveAddress);
 
         // ── Step 2: fetch Buy + Sell events from that curve ──────────────────
