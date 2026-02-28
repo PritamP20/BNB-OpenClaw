@@ -64,8 +64,26 @@ CREATE TRIGGER agents_updated_at
   BEFORE UPDATE ON agents
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+-- ── Skills table ────────────────────────────────────────────────────────────
+-- Stores the on-chain skill token metadata + the prompt that gets injected
+-- into conversations when the caller holds that skill token.
+CREATE TABLE IF NOT EXISTS skills (
+  id                  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  -- The deployed ERC-20 skill token address
+  skill_token_address TEXT         NOT NULL UNIQUE,
+  -- The agent token address this skill augments (used to filter by agent)
+  agent_token_address TEXT         NOT NULL,
+  name                TEXT         NOT NULL,
+  symbol              TEXT         NOT NULL,
+  -- System-prompt text injected before user messages when the wallet holds this skill
+  prompt              TEXT         NOT NULL DEFAULT '',
+  developer_wallet    TEXT         NOT NULL,
+  created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
 -- ── Indexes ──────────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_agents_token_address ON agents(token_address);
-CREATE INDEX IF NOT EXISTS idx_agents_developer    ON agents(developer_wallet);
-CREATE INDEX IF NOT EXISTS idx_access_log_agent    ON access_log(agent_id);
-CREATE INDEX IF NOT EXISTS idx_access_log_wallet   ON access_log(wallet_address);
+CREATE INDEX IF NOT EXISTS idx_agents_developer     ON agents(developer_wallet);
+CREATE INDEX IF NOT EXISTS idx_access_log_agent     ON access_log(agent_id);
+CREATE INDEX IF NOT EXISTS idx_access_log_wallet    ON access_log(wallet_address);
+CREATE INDEX IF NOT EXISTS idx_skills_agent_token   ON skills(agent_token_address);

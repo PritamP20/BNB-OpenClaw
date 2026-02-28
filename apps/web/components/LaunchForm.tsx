@@ -62,8 +62,10 @@ interface FormState {
   learningEnabled: boolean;
   // Skill
   agentId: string;
+  agentTokenAddress: string;
   skillId: string;
   costPerUse: string;
+  skillPrompt: string;
   // ── Docker runtime (agent only) ──
   dockerImage: string;
   containerPort: string;
@@ -86,10 +88,12 @@ const DEFAULT_FORM: FormState = {
   logicAddress: "",
   learningEnabled: true,
   agentId: "",
+  agentTokenAddress: "",
   skillId: "",
   costPerUse: "1",
+  skillPrompt: "",
   dockerImage: "",
-  containerPort: "8080",
+  containerPort: "3000",
   runEnvsJson: "{}",
   tokenAddress: "",
 };
@@ -1074,7 +1078,7 @@ export function LaunchForm() {
         treasury:          address!,
         developerWallet:   address!,
         dockerImage:       form.dockerImage.trim(),
-        containerPort:     parseInt(form.containerPort, 10) || 8080,
+        containerPort:     parseInt(form.containerPort, 10) || 3000,
         runEnvsJson:       form.runEnvsJson.trim(),
       });
     } else if (type === "normal") {
@@ -1091,13 +1095,15 @@ export function LaunchForm() {
       });
     } else if (type === "skill") {
       await deployHook.deploy({
-        type:       "skill",
-        name:       form.name.trim(),
-        symbol:     form.symbol.trim(),
-        supply:     parseEther(form.supply || "1000000000"),
-        agentId:    BigInt(form.agentId || "0"),
-        skillId:    form.skillId.trim(),
-        costPerUse: parseEther(form.costPerUse || "1"),
+        type:              "skill",
+        name:              form.name.trim(),
+        symbol:            form.symbol.trim(),
+        supply:            parseEther(form.supply || "1000000000"),
+        agentId:           BigInt(form.agentId || "0"),
+        agentTokenAddress: form.agentTokenAddress.trim() as `0x${string}`,
+        skillId:           form.skillId.trim(),
+        costPerUse:        parseEther(form.costPerUse || "1"),
+        skillPrompt:       form.skillPrompt.trim(),
       });
     }
     // Loading state cleared in the useEffect watching deployHook.step
@@ -1350,7 +1356,7 @@ export function LaunchForm() {
                 >
                   <input
                     className={errors.containerPort ? errorInputCls : inputCls}
-                    type="number" placeholder="8080" value={form.containerPort}
+                    type="number" placeholder="3000" value={form.containerPort}
                     onChange={(e) => set("containerPort", e.target.value)}
                   />
                 </Field>
@@ -1409,6 +1415,7 @@ export function LaunchForm() {
                   value={form.agentId}
                   onChange={(agentId, address, name) => {
                     set("agentId", agentId);
+                    set("agentTokenAddress", address);
                     setSelectedAgent(
                       agentTokens.find((a) => a.address === address) ?? null
                     );
@@ -1576,6 +1583,18 @@ export function LaunchForm() {
                   />
                 </Field>
               </div>
+
+              <Field
+                label="Skill Prompt"
+                hint="System-level instructions injected before the user's message when they hold this skill token. Leave empty for a display-only skill."
+              >
+                <textarea
+                  className={inputCls + " min-h-[96px] resize-y"}
+                  placeholder="e.g. You have access to live on-chain price data. Always include the current BNB price when answering financial questions."
+                  value={form.skillPrompt}
+                  onChange={(e) => set("skillPrompt", e.target.value)}
+                />
+              </Field>
             </>
           )}
 

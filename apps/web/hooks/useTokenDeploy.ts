@@ -117,8 +117,10 @@ export interface DeploySkillParams {
   symbol: string;
   supply: bigint;
   agentId: bigint;
+  agentTokenAddress: `0x${string}`;
   skillId: string; // human-readable → bytes32
   costPerUse: bigint;
+  skillPrompt: string; // injected into system message when user holds this token
 }
 
 export type DeployParams = DeployAgentParams | DeployNormalParams | DeploySkillParams;
@@ -442,6 +444,28 @@ export function useTokenDeploy() {
         const tokenAddr = logs[0]?.args.token;
         if (!tokenAddr) throw new Error("Could not read token address from SkillTokenDeployed event.");
         setTokenAddress(tokenAddr);
+
+        // Register skill in API so its prompt gets injected at chat time
+        try {
+          const skillBody = new URLSearchParams();
+          skillBody.append("skill_token_address", tokenAddr);
+          skillBody.append("agent_token_address", params.agentTokenAddress);
+          skillBody.append("name", params.name);
+          skillBody.append("symbol", params.symbol);
+          skillBody.append("prompt", params.skillPrompt);
+          if (walletClient?.account) {
+            skillBody.append("developer_wallet", walletClient.account.address);
+          }
+          await fetch(`${API_URL}/api/skills`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: skillBody.toString(),
+          });
+        } catch (e) {
+          console.warn("Skill registration failed (non-fatal):", e);
+          // Token is deployed; skill just won't have prompt injection until manually re-registered
+        }
+
         setStep("done");
       }
 

@@ -23,6 +23,7 @@
 
 import { Router, Request, Response } from "express";
 import { getTokenBalance } from "../lib/web3";
+import { db } from "../db/client";
 import { logger } from "../lib/logger";
 
 export const chatRouter = Router();
@@ -39,7 +40,7 @@ async function callOpenAI(
   messages: { role: string; content: string }[]
 ): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return ""; // signal: use fallback
+  if (!apiKey) return "";
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method:  "POST",
@@ -55,9 +56,100 @@ async function callOpenAI(
     }),
   });
 
-  if (!res.ok) return "";
+  if (!res.ok) throw new Error(`OpenAI ${res.status}: ${await res.text().catch(() => "unknown error")}`);
   const data = await res.json() as any;
-  return (data.choices?.[0]?.message?.content as string) ?? "";
+  const reply = (data.choices?.[0]?.message?.content as string) ?? "";
+  if (!reply) throw new Error("OpenAI returned an empty reply");
+  return reply;
+}
+
+// ── Groq fallback (OpenAI-compatible) ───────────────────────────────────────
+// Used when OpenAI fails or its key is absent. Groq uses the same request
+// format as OpenAI — only the base URL and model name differ.
+// Set GROQ_API_KEY in the API environment to enable.
+
+async function callGroq(
+  messages: { role: string; content: string }[]
+): Promise<string> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return "";
+
+  const model = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method:  "POST",
+    headers: {
+      "Content-Type":  "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      max_tokens:  512,
+      temperature: 0.75,
+    }),
+  });
+
+  if (!res.ok) throw new Error(`Groq ${res.status}: ${await res.text().catch(() => "unknown error")}`);
+  const data = await res.json() as any;
+  const reply = (data.choices?.[0]?.message?.content as string) ?? "";
+  if (!reply) throw new Error("Groq returned an empty reply");
+  return reply;
+}
+
+// ── Gemini fallback ───────────────────────────────────────────────────────────
+// Used automatically when OpenAI and Groq both fail.
+// Set GEMINI_API_KEY in the API environment to enable.
+
+async function callGemini(
+  messages: { role: string; content: string }[]
+): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return "";
+
+  // Gemini separates system instructions from the conversation turns
+  const systemMsg    = messages.find((m) => m.role === "system");
+  const conversation = messages.filter((m) => m.role !== "system");
+
+  // Gemini requires strictly alternating user/model turns; collapse consecutive
+  // same-role messages and map "assistant" → "model"
+  const contents: { role: string; parts: { text: string }[] }[] = [];
+  for (const m of conversation) {
+    const role = m.role === "assistant" ? "model" : "user";
+    const last = contents[contents.length - 1];
+    if (last && last.role === role) {
+      last.parts[0]!.text += "\n" + m.content;
+    } else {
+      contents.push({ role, parts: [{ text: m.content }] });
+    }
+  }
+  // Gemini requires the last turn to be from user
+  if (!contents.length || contents[contents.length - 1]!.role !== "user") {
+    contents.push({ role: "user", parts: [{ text: "Continue." }] });
+  }
+
+  const body: Record<string, unknown> = {
+    contents,
+    generationConfig: { maxOutputTokens: 512, temperature: 0.75 },
+  };
+  if (systemMsg) {
+    body.system_instruction = { parts: [{ text: systemMsg.content }] };
+  }
+
+  const model = process.env.GEMINI_MODEL ?? "gemini-1.5-flash";
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(body),
+    }
+  );
+
+  if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text().catch(() => "unknown error")}`);
+  const data = await res.json() as any;
+  const reply = (data.candidates?.[0]?.content?.parts?.[0]?.text as string) ?? "";
+  if (!reply) throw new Error("Gemini returned an empty reply");
+  return reply;
 }
 
 // ── Template fallback ────────────────────────────────────────────────────────
@@ -181,15 +273,63 @@ chatRouter.post("/", async (req: Request, res: Response) => {
     return;
   }
 
+  // ── Resolve on-chain skill prompts ─────────────────────────────────────────
+  // Look up all registered skills for this agent, then check which ones the
+  // caller actually holds. Only held skills have their prompts injected.
+  let heldSkillPrompts: { name: string; symbol: string; prompt: string }[] = [];
+  try {
+    const { rows: skillRows } = await db.query<{
+      skill_token_address: string;
+      name:                string;
+      symbol:              string;
+      prompt:              string;
+    }>(
+      `SELECT skill_token_address, name, symbol, prompt
+       FROM skills
+       WHERE agent_token_address = $1 AND prompt != ''`,
+      [agentTokenAddress.toLowerCase()]
+    );
+
+    if (skillRows.length > 0) {
+      const balances = await Promise.all(
+        skillRows.map(async (skill) => {
+          try {
+            const bal = await getTokenBalance(skill.skill_token_address, userAddress);
+            return bal > 0n ? skill : null;
+          } catch {
+            return null;
+          }
+        })
+      );
+      heldSkillPrompts = balances.filter(
+        (s): s is { skill_token_address: string; name: string; symbol: string; prompt: string } => s !== null
+      );
+    }
+  } catch (e) {
+    // Non-fatal: skill injection is best-effort
+    logger.warn("Skill prompt resolution failed", { agentTokenAddress, error: e });
+  }
+
   // ── Build messages for OpenAI ──────────────────────────────────────────────
-  const skillContext = selectedSkills.length > 0
+  // Held skill prompts are injected as first-class system instructions so the
+  // AI applies them before processing the user message.
+  const skillSystemBlocks = heldSkillPrompts.map(
+    (s) => `## Skill: ${s.name} ($${s.symbol})\n${s.prompt}`
+  );
+
+  const legacySkillContext = selectedSkills.length > 0
     ? `\nActive skill modules: ${selectedSkills.map((s) => `${s.name} ($${s.symbol})`).join(", ")}.\nUse these skills as context when answering.`
     : "";
 
   const systemPrompt = [
     `You are ${agentName}, an AI agent deployed on BNB Chain.`,
     agentDescription ? `Your purpose: ${agentDescription}` : "",
-    skillContext,
+    ...(skillSystemBlocks.length > 0
+      ? [
+          "The user holds the following skill modules. Apply their instructions when formulating your response:",
+          skillSystemBlocks.join("\n\n"),
+        ]
+      : [legacySkillContext]),
     "Keep responses concise and helpful. Mention your on-chain nature when relevant.",
     "You are accessed via token-gating — the user holds your token and has paid AI credits.",
   ].filter(Boolean).join("\n");
@@ -201,9 +341,29 @@ chatRouter.post("/", async (req: Request, res: Response) => {
   ];
 
   // ── Generate reply ─────────────────────────────────────────────────────────
+  // Cascade: OpenAI → Groq → Gemini → template fallback.
+  // The same messages array (with skill prompts injected) is passed to
+  // whichever provider responds, so skills behave identically across all.
+  // Each provider returns "" if its key is missing; throws on API errors.
+  // We iterate until one returns a non-empty reply.
   let reply: string;
 
-  const aiReply = await callOpenAI(openAiMessages);
+  let aiReply = "";
+  const providers: { name: string; fn: () => Promise<string> }[] = [
+    { name: "OpenAI", fn: () => callOpenAI(openAiMessages) },
+    { name: "Groq",   fn: () => callGroq(openAiMessages)   },
+    { name: "Gemini", fn: () => callGemini(openAiMessages)  },
+  ];
+
+  for (const provider of providers) {
+    try {
+      aiReply = await provider.fn();
+      if (aiReply) break; // got a reply — stop trying
+    } catch (err) {
+      logger.warn(`${provider.name} failed, trying next provider`, { error: (err as Error).message });
+    }
+  }
+
   if (aiReply) {
     reply = aiReply;
   } else {
@@ -223,8 +383,9 @@ chatRouter.post("/", async (req: Request, res: Response) => {
 
   res.json({
     reply,
-    creditCost:  CREDIT_COST,
-    tokensHeld:  tokensHeldEther,
-    creditsRate: CREDITS_PER_TOKEN,
+    creditCost:   CREDIT_COST,
+    tokensHeld:   tokensHeldEther,
+    creditsRate:  CREDITS_PER_TOKEN,
+    activeSkills: heldSkillPrompts.map((s) => ({ name: s.name, symbol: s.symbol })),
   });
 });

@@ -6,6 +6,7 @@ import { migrate } from "./db/client";
 import { agentsRouter } from "./routes/agents";
 import { proxyRouter }  from "./routes/proxy";
 import { chatRouter }   from "./routes/chat";
+import { skillsRouter } from "./routes/skills";
 import { logger } from "./lib/logger";
 
 const app = express();
@@ -30,6 +31,9 @@ app.get("/health", (_req, res) => {
 
 // Agent management API
 app.use("/api/agents", agentsRouter);
+
+// Skill module registry
+app.use("/api/skills", skillsRouter);
 
 // AI Chat (token-gated)
 app.use("/api/chat", chatRouter);

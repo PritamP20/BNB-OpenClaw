@@ -507,7 +507,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
   const detectedType: Token["type"] =
     chainSkillId != null && chainSkillId !== ZERO_BYTES32
       ? "skill"
-      : chainAgentId != null && chainAgentId > 0n
+      : chainAgentId != null          // agentId() exists on this contract (even if 0)
         ? "agent"
         : "normal";
 

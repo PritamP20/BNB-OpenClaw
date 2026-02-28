@@ -59,7 +59,7 @@ agentsRouter.post(
       return;
     }
 
-    const containerPort = portStr ? parseInt(portStr, 10) : 8080;
+    const containerPort = portStr ? parseInt(portStr, 10) : 3000;
     if (isNaN(containerPort) || containerPort < 1 || containerPort > 65535) {
       res.status(400).json({ errors: ["container_port must be 1–65535"] });
       return;

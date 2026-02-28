@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { bscTestnet } from "wagmi/chains";
 import { formatEther } from "viem";
-import { MessageSquare, Send, Cpu, Zap, ChevronRight, CheckSquare, Square, Bot, User, Loader2, AlertCircle, CheckCircle, Radio } from "lucide-react";
+import { MessageSquare, Send, Cpu, Zap, ChevronRight, CheckSquare, Bot, User, Loader2, AlertCircle, CheckCircle, Radio } from "lucide-react";
 import { useTokens, type Token } from "../../hooks/useTokens";
 import { ERC20_ABI } from "../../lib/contracts";
 
@@ -42,86 +42,137 @@ const CREDITS_PER_TOKEN = 200;
 const CREDIT_COST       = 1;
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
-// ── Skill toggle checkbox ────────────────────────────────────────────────────
+// ── Agent tree node (agent + inline skill branches) ─────────────────────────
 
-function SkillToggle({
-  skill,
-  selected,
-  onToggle,
-}: {
-  skill:    SkillInfo;
-  selected: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <button
-      onClick={onToggle}
-      className="flex items-start gap-2 w-full text-left p-2 rounded-lg transition-colors hover:bg-[#2a2a35] group"
-    >
-      <span className="mt-0.5 text-[#F3BA2F] flex-shrink-0">
-        {selected ? <CheckSquare size={15} /> : <Square size={15} className="opacity-40 group-hover:opacity-70" />}
-      </span>
-      <div className="min-w-0">
-        <p className="text-xs font-medium text-white truncate">{skill.name}</p>
-        <p className="text-[10px] text-[#6b7280] truncate">${skill.symbol}</p>
-      </div>
-    </button>
-  );
-}
-
-// ── Agent sidebar card ───────────────────────────────────────────────────────
-
-function AgentCard({
+function AgentTreeNode({
   token,
   balance,
   selected,
   onSelect,
+  skills,
+  allSkills,
+  skillsLoading,
+  selectedSkillAddrs,
+  onToggleSkill,
 }: {
-  token:    Token;
-  balance:  bigint;
-  selected: boolean;
-  onSelect: () => void;
+  token:              Token;
+  balance:            bigint;
+  selected:           boolean;
+  onSelect:           () => void;
+  skills:             SkillInfo[];
+  allSkills:          SkillInfo[];
+  skillsLoading:      boolean;
+  selectedSkillAddrs: Set<string>;
+  onToggleSkill:      (addr: string) => void;
 }) {
   const credits   = Math.floor(Number(formatEther(balance)) * CREDITS_PER_TOKEN);
   const hasTokens = balance > 0n;
 
   return (
-    <button
-      onClick={onSelect}
-      disabled={!hasTokens}
-      className={`w-full text-left p-3 rounded-xl border transition-all ${
-        selected
-          ? "border-[#F3BA2F] bg-[#F3BA2F]/10"
-          : hasTokens
-          ? "border-[#2a2a35] bg-[#16161a] hover:border-[#F3BA2F]/40"
-          : "border-[#2a2a35] bg-[#16161a]/50 opacity-50 cursor-not-allowed"
-      }`}
-    >
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F3BA2F]/30 to-purple-600/30 flex items-center justify-center text-sm">
-          🤖
+    <div className="select-none">
+      {/* ── Agent row ── */}
+      <button
+        onClick={onSelect}
+        disabled={!hasTokens}
+        className={`w-full text-left px-3 py-2.5 rounded-xl border transition-all ${
+          selected
+            ? "border-[#F3BA2F] bg-[#F3BA2F]/10"
+            : hasTokens
+            ? "border-[#2a2a35] bg-[#16161a] hover:border-[#F3BA2F]/40"
+            : "border-[#2a2a35] bg-[#16161a]/50 opacity-40 cursor-not-allowed"
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F3BA2F]/30 to-purple-600/30 flex items-center justify-center text-sm flex-shrink-0">
+            🤖
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-white truncate">{token.name}</p>
+            <p className="text-[10px] text-[#6b7280]">${token.symbol}</p>
+          </div>
+          <ChevronRight
+            size={13}
+            className={`flex-shrink-0 transition-transform ${
+              selected ? "rotate-90 text-[#F3BA2F]" : "text-[#3a3a45]"
+            }`}
+          />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-white truncate">{token.name}</p>
-          <p className="text-[11px] text-[#6b7280]">${token.symbol}</p>
-        </div>
-        {selected && <ChevronRight size={14} className="text-[#F3BA2F] flex-shrink-0" />}
-      </div>
-      <div className="mt-2 flex items-center gap-3 text-[11px]">
-        <span className={`font-medium ${hasTokens ? "text-[#F3BA2F]" : "text-[#6b7280]"}`}>
-          {Number(formatEther(balance)).toFixed(4)} tokens
-        </span>
-        {hasTokens && (
-          <span className="text-[#6b7280]">
-            <Zap size={9} className="inline mr-0.5" />
-            {credits} credits
+        <div className="mt-1.5 flex items-center gap-2 text-[10px]">
+          <span className={`font-medium ${hasTokens ? "text-[#F3BA2F]" : "text-[#6b7280]"}`}>
+            {Number(formatEther(balance)).toFixed(2)} tokens
           </span>
-        )}
-        {!hasTokens && (
-          <span className="text-red-400">No tokens — buy first</span>
-        )}
-      </div>
-    </button>
+          {hasTokens && (
+            <span className="text-[#6b7280]">
+              <Zap size={8} className="inline mr-0.5" />{credits} credits
+            </span>
+          )}
+          {!hasTokens && <span className="text-red-400/80">No tokens</span>}
+        </div>
+      </button>
+
+      {/* ── Skill branches (only when this agent is selected) ── */}
+      {selected && (
+        <div className="ml-3 mt-1 mb-1">
+          {skillsLoading ? (
+            <div className="flex items-center gap-2 pl-5 py-2">
+              <Loader2 size={11} className="animate-spin text-[#F3BA2F]" />
+              <span className="text-[10px] text-[#6b7280]">Loading skills…</span>
+            </div>
+          ) : allSkills.length === 0 ? (
+            <div className="pl-5 py-2">
+              <p className="text-[10px] text-[#6b7280] italic">No skill tokens yet</p>
+            </div>
+          ) : (
+            <div className="space-y-0.5">
+              {allSkills.map((s, i) => {
+                const owned    = skills.some((owned) => owned.address === s.address);
+                const isActive = selectedSkillAddrs.has(s.address.toLowerCase());
+                const isLast   = i === allSkills.length - 1;
+                return (
+                  <div key={s.address} className="flex items-stretch">
+                    {/* Tree connector */}
+                    <div className="flex flex-col items-center w-5 flex-shrink-0">
+                      <div className="w-px flex-1 bg-[#2a2a35]" />
+                      <div className={`w-3 border-b border-[#2a2a35] mt-0 ${ isLast ? "mb-auto" : "" }`} />
+                      {!isLast && <div className="w-px flex-1 bg-[#2a2a35]" />}
+                    </div>
+                    {/* Skill row */}
+                    <button
+                      onClick={() => owned && onToggleSkill(s.address.toLowerCase())}
+                      disabled={!owned}
+                      title={owned ? (isActive ? "Deactivate skill" : "Activate skill") : "You don't hold this skill token"}
+                      className={`flex-1 flex items-center gap-2 text-left px-2 py-1.5 rounded-lg text-[11px] transition-colors ${
+                        !owned
+                          ? "opacity-35 cursor-not-allowed"
+                          : isActive
+                          ? "bg-[#F3BA2F]/10 hover:bg-[#F3BA2F]/15"
+                          : "hover:bg-[#2a2a35]"
+                      }`}
+                    >
+                      <Zap
+                        size={10}
+                        className={`flex-shrink-0 ${
+                          isActive ? "text-[#F3BA2F]" : owned ? "text-[#4a4a55]" : "text-[#2a2a35]"
+                        }`}
+                      />
+                      <span className={`truncate font-medium ${
+                        isActive ? "text-white" : owned ? "text-[#9a9aaa]" : "text-[#5a5a65]"
+                      }`}>
+                        {s.name}
+                      </span>
+                      <span className="text-[9px] text-[#6b7280] ml-auto flex-shrink-0">${s.symbol}</span>
+                      {isActive && (
+                        <CheckSquare size={10} className="text-[#F3BA2F] flex-shrink-0" />
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -384,31 +435,9 @@ export function ChatPageClient() {
       // ── Route through the live proxy if agent is deployed ──────────────
       const isLive = !!agentDb?.chatUrl && agentDb.status === "deployed";
 
-      let res: Response;
-
-      if (isLive && walletClient && agentDb) {
-        // Sign the canonical access-message for the token-gate middleware.
-        const timestampSeconds = Math.floor(Date.now() / 1000);
-        const message = buildAccessMessage(agentDb.id, timestampSeconds);
-        const signature = await walletClient.signMessage({ message });
-
-        res = await fetch(`${API_URL}${agentDb.chatUrl}`, {
-          method:  "POST",
-          headers: {
-            "Content-Type":    "application/json",
-            "x-wallet-address": address,
-            "x-signature":      signature,
-            "x-timestamp":      String(timestampSeconds),
-          },
-          body: JSON.stringify({
-            message:        userMsg.content,
-            selectedSkills: activeSkills.map((s) => ({ name: s.name, symbol: s.symbol })),
-            history:        messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
-          }),
-        });
-      } else {
-        // Fallback: standard /api/chat endpoint (no live container yet)
-        res = await fetch(`${API_URL}/api/chat`, {
+      // Helper: always-available fallback via /api/chat (uses Groq on the server)
+      const callBuiltinChat = () =>
+        fetch(`${API_URL}/api/chat`, {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({
@@ -421,6 +450,40 @@ export function ChatPageClient() {
             history:           messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
           }),
         });
+
+      let res: Response;
+
+      if (isLive && walletClient && agentDb) {
+        // Try the live container first
+        try {
+          const timestampSeconds = Math.floor(Date.now() / 1000);
+          const message = buildAccessMessage(agentDb.id, timestampSeconds);
+          const signature = await walletClient.signMessage({ message });
+
+          const liveRes = await fetch(`${API_URL}${agentDb.chatUrl}`, {
+            method:  "POST",
+            headers: {
+              "Content-Type":     "application/json",
+              "x-wallet-address": address,
+              "x-signature":      signature,
+              "x-timestamp":      String(timestampSeconds),
+            },
+            body: JSON.stringify({
+              message:        userMsg.content,
+              selectedSkills: activeSkills.map((s) => ({ name: s.name, symbol: s.symbol })),
+              history:        messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+            }),
+          });
+
+          if (!liveRes.ok) throw new Error(`Agent endpoint ${liveRes.status}`);
+          res = liveRes;
+        } catch {
+          // Live container unreachable or errored — silently fall back to Groq
+          res = await callBuiltinChat();
+        }
+      } else {
+        // No live container yet — go straight to /api/chat (Groq)
+        res = await callBuiltinChat();
       }
 
       if (res.status === 403) {
@@ -502,55 +565,22 @@ export function ChatPageClient() {
             </a>
           </div>
         ) : (
-          /* Agent list — only agents the user holds */
+          /* Agent tree — agents the user holds, with skill branches */
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {ownedAgentTokens.map((t) => (
-              <AgentCard
+              <AgentTreeNode
                 key={t.address}
                 token={t}
                 balance={agentBalances.get(t.address.toLowerCase()) ?? 0n}
                 selected={selectedAgent?.address === t.address}
                 onSelect={() => setSelectedAgent((prev) => (prev?.address === t.address ? null : t))}
+                skills={skills}
+                allSkills={selectedAgent?.address === t.address ? allSkills : []}
+                skillsLoading={selectedAgent?.address === t.address ? skillBalancesLoading : false}
+                selectedSkillAddrs={selectedSkillAddrs}
+                onToggleSkill={toggleSkill}
               />
             ))}
-          </div>
-        )}
-
-        {/* ── Skill tree (shown when agent is selected) ──────────────────── */}
-        {selectedAgent && (
-          <div className="border-t border-[#2a2a35]">
-            <div className="p-3 pb-1">
-              <h3 className="text-xs font-semibold text-[#F3BA2F] flex items-center gap-1.5">
-                <Zap size={11} />
-                Skill Modules
-              </h3>
-              <p className="text-[10px] text-[#6b7280] mt-0.5">Toggle skills to include as context</p>
-            </div>
-            <div className="max-h-48 overflow-y-auto px-2 pb-2">
-              {skillBalancesLoading ? (
-                <div className="flex items-center gap-2 px-2 py-3">
-                  <Loader2 size={12} className="animate-spin text-[#F3BA2F]" />
-                  <span className="text-[11px] text-[#6b7280]">Loading skills…</span>
-                </div>
-              ) : allSkills.length === 0 ? (
-                <p className="text-[11px] text-[#6b7280] italic px-2 py-3">
-                  No skill tokens launched for this agent yet.
-                </p>
-              ) : skills.length === 0 ? (
-                <p className="text-[11px] text-[#6b7280] italic px-2 py-3">
-                  You don't hold any skill tokens for this agent.
-                </p>
-              ) : (
-                skills.map((s) => (
-                  <SkillToggle
-                    key={s.address}
-                    skill={s}
-                    selected={selectedSkillAddrs.has(s.address.toLowerCase())}
-                    onToggle={() => toggleSkill(s.address.toLowerCase())}
-                  />
-                ))
-              )}
-            </div>
           </div>
         )}
       </aside>
