@@ -38,9 +38,18 @@ RUN npm ci --ignore-scripts
 
 # Use /api as the API base — Next.js rewrites /api/* → http://127.0.0.1:4000/*
 # so the browser never needs to know the container's hostname.
+# NEXT_PUBLIC_* vars are baked into the JS bundle at build time.
 ENV NEXT_PUBLIC_API_URL=/api \
     NEXT_TELEMETRY_DISABLED=1 \
-    NODE_ENV=production
+    NODE_ENV=production \
+    NEXT_PUBLIC_NFA_MANAGER=0x1e48F8bB9855482A9597cCa80BbE183e1dE9EE40 \
+    NEXT_PUBLIC_AGENT_REGISTRY=0x57c3788588bA70FfFabBc00CbC0695D6fCAb940f \
+    NEXT_PUBLIC_TOKEN_FACTORY=0x2D4D2807BC5c2CC1290e1ad41C7CCf300d8f9b84 \
+    NEXT_PUBLIC_PLU_VAULT=0xba4067Dfe540cb5Fb3994ce1D1D6005C231229dB \
+    NEXT_PUBLIC_DAMM_MANAGER=0x66F46B310ecd84630c98F0edb29500f93D5Aa0F8 \
+    NEXT_PUBLIC_BUYBACK_BURN=0x403Bd6277aFf30CCFf6C343Ba74Bb7eeDbc43027 \
+    NEXT_PUBLIC_REPUTATION_ENGINE=0xa7ddE615DA1B5Ec0E9BE95c60Cdba96109351cF4 \
+    NEXT_PUBLIC_INCENTIVE_ENGINE=0x033003a5f31ab3D088665aBb791fac67e5b8c557
 
 COPY apps/web/                   ./apps/web/
 COPY packages/ui/                ./packages/ui/
