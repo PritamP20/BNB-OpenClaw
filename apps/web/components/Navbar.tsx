@@ -18,7 +18,7 @@ import { bscTestnet } from "wagmi/chains";
 import {
   Zap, Rocket, BarChart2, Menu, X,
   AlertTriangle, Loader2, ChevronDown, MessageSquare,
-  Wallet,
+  Wallet, Code2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -26,6 +26,7 @@ const navLinks = [
   { href: "/",       label: "Explore", icon: BarChart2     },
   { href: "/launch", label: "Launch",  icon: Rocket        },
   { href: "/chat",   label: "Chat",    icon: MessageSquare },
+  { href: "/sdk",    label: "SDK",     icon: Code2         },
 ];
 
 export function Navbar() {
