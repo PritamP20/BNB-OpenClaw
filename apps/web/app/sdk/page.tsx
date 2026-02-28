@@ -16,9 +16,10 @@ function CopyBtn({ text }: { text: string }) {
   return (
     <button
       onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1800); }}
-      className="flex items-center gap-1.5 text-[11px] text-[#6b7280] hover:text-white transition-colors"
+      className="flex items-center gap-1.5 text-[11px] transition-colors font-bold uppercase tracking-wider"
+      style={{ color: copied ? "#4ade80" : "#555555" }}
     >
-      {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
+      {copied ? <Check size={12} /> : <Copy size={12} />}
       {copied ? "Copied" : "Copy"}
     </button>
   );
@@ -28,12 +29,12 @@ function CopyBtn({ text }: { text: string }) {
 
 function CodeBlock({ code, lang = "bash" }: { code: string; lang?: string }) {
   return (
-    <div className="relative rounded-xl border border-[#2a2a35] bg-[#0a0a0f] overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[#2a2a35] bg-[#111118]">
-        <span className="text-[10px] font-mono text-[#6b7280] uppercase tracking-wider">{lang}</span>
+    <div className="relative overflow-hidden" style={{ border: "1px solid #333333" }}>
+      <div className="flex items-center justify-between px-4 py-2" style={{ background: "#222222", borderBottom: "1px solid #333333" }}>
+        <span className="text-[10px] font-black font-mono uppercase tracking-widest" style={{ color: "#555555" }}>{lang}</span>
         <CopyBtn text={code} />
       </div>
-      <pre className="px-4 py-4 text-sm font-mono text-[#e2e8f0] overflow-x-auto leading-relaxed whitespace-pre">{code}</pre>
+      <pre className="px-4 py-4 text-sm font-mono overflow-x-auto leading-relaxed whitespace-pre" style={{ background: "#111111", color: "#e2e8f0" }}>{code}</pre>
     </div>
   );
 }
@@ -48,18 +49,21 @@ function Section({ title, icon: Icon, children, defaultOpen = true }: {
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-[#2a2a35] rounded-2xl overflow-hidden">
+    <div style={{ border: "1px solid #333333", overflow: "hidden" }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-5 py-4 bg-[#111118] hover:bg-[#16161e] transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 transition-colors"
+        style={{ background: "#1A1A1A" }}
+        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "#222222"; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "#1A1A1A"; }}
       >
-        <span className="flex items-center gap-2.5 text-sm font-semibold text-white">
-          <Icon size={15} className="text-[#F3BA2F]" />
+        <span className="flex items-center gap-2.5 text-sm font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>
+          <Icon size={14} style={{ color: "#F5C220" }} />
           {title}
         </span>
-        {open ? <ChevronDown size={15} className="text-[#6b7280]" /> : <ChevronRight size={15} className="text-[#6b7280]" />}
+        {open ? <ChevronDown size={14} style={{ color: "#555555" }} /> : <ChevronRight size={14} style={{ color: "#555555" }} />}
       </button>
-      {open && <div className="px-5 py-5 space-y-5 bg-[#0e0e13]">{children}</div>}
+      {open && <div className="px-5 py-5 space-y-5" style={{ background: "#111111" }}>{children}</div>}
     </div>
   );
 }
@@ -68,10 +72,13 @@ function Section({ title, icon: Icon, children, defaultOpen = true }: {
 
 function Method({ m }: { m: "POST" | "GET" }) {
   return (
-    <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
-      m === "POST" ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                   : "bg-green-500/20 text-green-300 border border-green-500/30"
-    }`}>
+    <span
+      className="text-[10px] font-black font-mono px-2 py-0.5 uppercase tracking-wider"
+      style={{
+        background: m === "POST" ? "#1B4EF8" : "#4ade80",
+        color: m === "POST" ? "#FFFFFF" : "#0F0F0F",
+      }}
+    >
       {m}
     </span>
   );
@@ -79,13 +86,13 @@ function Method({ m }: { m: "POST" | "GET" }) {
 
 function Param({ name, type, req, desc }: { name: string; type: string; req?: boolean; desc: string }) {
   return (
-    <div className="flex gap-4 py-2.5 border-b border-[#1e1e28] last:border-0">
+    <div className="flex gap-4 py-2.5" style={{ borderBottom: "1px solid #222222" }}>
       <div className="w-48 flex-shrink-0">
-        <code className="text-xs text-[#F3BA2F] font-mono">{name}</code>
-        {req && <span className="ml-1.5 text-[9px] text-red-400 font-semibold">required</span>}
+        <code className="text-xs font-mono font-bold" style={{ color: "#F5C220" }}>{name}</code>
+        {req && <span className="ml-1.5 text-[9px] font-black uppercase tracking-wider" style={{ color: "#D62828" }}>required</span>}
       </div>
-      <code className="text-[10px] text-[#6b7280] font-mono w-20 flex-shrink-0 pt-0.5">{type}</code>
-      <p className="text-xs text-[#9a9aaa]">{desc}</p>
+      <code className="text-[10px] font-mono w-20 flex-shrink-0 pt-0.5" style={{ color: "#555555" }}>{type}</code>
+      <p className="text-xs" style={{ color: "#888888" }}>{desc}</p>
     </div>
   );
 }
@@ -193,38 +200,38 @@ console.log(await chat("Hi, what can you do?"));
 console.log(await chat("Tell me about DeFi yields"));`;
 
   return (
-    <div className="min-h-screen bg-[#08080c] text-white">
+    <div className="min-h-screen" style={{ background: "#0F0F0F", color: "#F5F5F5" }}>
       {/* Header */}
-      <div className="border-b border-[#2a2a35] bg-[#0e0e13]">
+      <div style={{ borderBottom: "1px solid #222222", background: "#111111" }}>
         <div className="max-w-5xl mx-auto px-6 py-10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F3BA2F]/10 border border-[#F3BA2F]/20 flex items-center justify-center">
-              <Code2 size={18} className="text-[#F3BA2F]" />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 flex items-center justify-center" style={{ background: "#F5C220" }}>
+              <Code2 size={18} style={{ color: "#0F0F0F" }} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Developer SDK</h1>
-              <p className="text-sm text-[#6b7280]">Integrate AI agents into any app or tool</p>
+              <h1 className="text-2xl font-black uppercase tracking-tight" style={{ color: "#F5F5F5" }}>Developer SDK</h1>
+              <p className="text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: "#555555" }}>Integrate AI agents into any app or tool</p>
             </div>
           </div>
-          <p className="text-sm text-[#9a9aaa] max-w-2xl mt-4">
+          <p className="text-sm max-w-2xl mt-4" style={{ color: "#888888" }}>
             Every agent on OpenClaw exposes a simple REST endpoint. No SDK required — use{" "}
-            <code className="text-[#F3BA2F] bg-[#F3BA2F]/10 px-1.5 py-0.5 rounded text-xs">fetch</code>,{" "}
-            <code className="text-[#F3BA2F] bg-[#F3BA2F]/10 px-1.5 py-0.5 rounded text-xs">curl</code>, Python, or any HTTP client.
+            <code className="font-mono text-xs" style={{ color: "#F5C220", background: "rgba(245,194,32,0.1)", padding: "1px 5px" }}>fetch</code>,{" "}
+            <code className="font-mono text-xs" style={{ color: "#F5C220", background: "rgba(245,194,32,0.1)", padding: "1px 5px" }}>curl</code>, Python, or any HTTP client.
             Token-gating is verified on‑chain — holding the agent token is your API key.
           </p>
 
           {/* Quick stats */}
           <div className="flex flex-wrap gap-3 mt-6">
             {[
-              { icon: Key,      label: "Auth",     value: "Wallet address + token balance" },
-              { icon: Zap,      label: "AI",       value: "Groq Llama 3.3 70B (free tier)" },
-              { icon: Globe,    label: "Base URL",  value: API_URL },
-              { icon: Bot,      label: "Skills",   value: "Injected automatically" },
+              { icon: Key,   label: "Auth",    value: "Wallet address + token balance" },
+              { icon: Zap,   label: "AI",      value: "Groq Llama 3.3 70B (free tier)" },
+              { icon: Globe, label: "Base URL", value: API_URL },
+              { icon: Bot,   label: "Skills",  value: "Injected automatically" },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-center gap-2 bg-[#111118] border border-[#2a2a35] rounded-xl px-4 py-2.5">
-                <Icon size={13} className="text-[#F3BA2F]" />
-                <span className="text-[11px] text-[#6b7280]">{label}:</span>
-                <span className="text-[11px] text-white font-mono">{value}</span>
+              <div key={label} className="flex items-center gap-2 px-4 py-2.5" style={{ background: "#1A1A1A", border: "1px solid #333333" }}>
+                <Icon size={13} style={{ color: "#F5C220" }} />
+                <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "#555555" }}>{label}:</span>
+                <span className="text-[11px] font-mono" style={{ color: "#F5F5F5" }}>{value}</span>
               </div>
             ))}
           </div>
@@ -236,18 +243,18 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Authentication */}
         <Section title="Authentication" icon={Key}>
-          <p className="text-sm text-[#9a9aaa]">
+          <p className="text-sm" style={{ color: "#888888" }}>
             There are no API keys. Access is token-gated on‑chain. Pass your wallet address
-            as <code className="text-[#F3BA2F] text-xs">userAddress</code> — the server checks
+            as <code className="text-xs" style={{ color: "#F5C220" }}>userAddress</code> — the server checks
             your on‑chain balance of the agent token in real time. Hold ≥ 1 wei to get access.
           </p>
-          <div className="bg-[#111118] border border-[#F3BA2F]/20 rounded-xl p-4 text-sm">
-            <p className="text-[#F3BA2F] font-semibold text-xs mb-1">Your wallet address (auto-filled when connected)</p>
-            <code className="text-white font-mono text-xs break-all">{walletAddr}</code>
+          <div className="p-4 text-sm" style={{ background: "#1A1A1A", border: "1px solid #F5C220", borderLeft: "3px solid #F5C220" }}>
+            <p className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: "#F5C220" }}>Your wallet address (auto-filled when connected)</p>
+            <code className="font-mono text-xs break-all" style={{ color: "#F5F5F5" }}>{walletAddr}</code>
           </div>
-          <p className="text-xs text-[#6b7280]">
-            Each message costs <strong className="text-white">1 credit</strong>. Credits are calculated from your token
-            balance: <strong className="text-white">1 whole token = 200 credits</strong>.
+          <p className="text-xs" style={{ color: "#888888" }}>
+            Each message costs <strong style={{ color: "#F5F5F5" }}>1 credit</strong>. Credits are calculated from your token
+            balance: <strong style={{ color: "#F5F5F5" }}>1 whole token = 200 credits</strong>.
           </p>
         </Section>
 
@@ -255,16 +262,16 @@ console.log(await chat("Tell me about DeFi yields"));`;
         <Section title="POST /api/chat — Send a message" icon={Terminal}>
           <div className="flex items-center gap-3 mb-1">
             <Method m="POST" />
-            <code className="text-sm font-mono text-white">/api/chat</code>
+            <code className="text-sm font-mono" style={{ color: "#F5F5F5" }}>/api/chat</code>
           </div>
-          <p className="text-sm text-[#9a9aaa]">
+          <p className="text-sm" style={{ color: "#888888" }}>
             Send a message and receive an AI reply. Skills held by the user are automatically
             injected as system context.
           </p>
 
           <div>
-            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Request body</p>
-            <div className="rounded-xl border border-[#2a2a35] overflow-hidden">
+            <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: "#555555" }}>Request body</p>
+            <div style={{ border: "1px solid #333333", overflow: "hidden" }}>
               <Param name="agentTokenAddress" type="string" req desc="ERC-20 address of the agent token (0x…)" />
               <Param name="userAddress"       type="string" req desc="Caller's wallet address — used for token-gate check" />
               <Param name="message"           type="string" req desc="The user's message" />
@@ -276,8 +283,8 @@ console.log(await chat("Tell me about DeFi yields"));`;
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Response</p>
-            <div className="rounded-xl border border-[#2a2a35] overflow-hidden">
+            <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: "#555555" }}>Response</p>
+            <div style={{ border: "1px solid #333333", overflow: "hidden" }}>
               <Param name="reply"        type="string" desc="AI-generated response text" />
               <Param name="creditCost"   type="number" desc="Credits deducted for this message (always 1)" />
               <Param name="tokensHeld"   type="string" desc="Caller's token balance in ether units" />
@@ -286,7 +293,7 @@ console.log(await chat("Tell me about DeFi yields"));`;
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Examples</p>
+            <p className="text-xs font-black uppercase tracking-wider" style={{ color: "#555555" }}>Examples</p>
             <CodeBlock lang="bash" code={curlChat} />
             <CodeBlock lang="javascript" code={jsChat} />
             <CodeBlock lang="python" code={pythonChat} />
@@ -295,8 +302,8 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Conversational history */}
         <Section title="Multi-turn conversations" icon={BookOpen} defaultOpen={false}>
-          <p className="text-sm text-[#9a9aaa]">
-            Pass previous messages in the <code className="text-[#F3BA2F] text-xs">history</code> array
+          <p className="text-sm" style={{ color: "#888888" }}>
+            Pass previous messages in the <code className="text-xs" style={{ color: "#F5C220" }}>history</code> array
             to maintain context across turns. The server uses the last 10 messages.
           </p>
           <CodeBlock lang="javascript" code={jsStream} />
@@ -304,20 +311,20 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Skills */}
         <Section title="Skill tokens — automatic prompt injection" icon={Zap} defaultOpen={false}>
-          <p className="text-sm text-[#9a9aaa]">
+          <p className="text-sm" style={{ color: "#888888" }}>
             Skill tokens extend agent behaviour. When a user holds a skill token linked to an agent,
             the skill's system prompt is automatically injected before every message — no extra API work needed.
           </p>
-          <div className="grid grid-cols-3 gap-3 text-xs">
+          <div className="grid grid-cols-3 gap-0 text-xs" style={{ border: "1px solid #333333" }}>
             {[
               { step: "1", title: "Launch skill token",   desc: "Deploy via /launch → Skill, attach a prompt" },
               { step: "2", title: "User buys skill",      desc: "Holds ≥ 1 wei on BSC Testnet" },
               { step: "3", title: "Prompt auto-injected", desc: "Server checks balance + injects on every /api/chat call" },
-            ].map(({ step, title, desc }) => (
-              <div key={step} className="bg-[#111118] border border-[#2a2a35] rounded-xl p-4">
-                <div className="w-6 h-6 rounded-full bg-[#F3BA2F]/20 text-[#F3BA2F] text-[10px] font-bold flex items-center justify-center mb-2">{step}</div>
-                <p className="font-semibold text-white mb-1">{title}</p>
-                <p className="text-[#6b7280]">{desc}</p>
+            ].map(({ step, title, desc }, i) => (
+              <div key={step} className="p-4" style={{ background: "#1A1A1A", borderRight: i < 2 ? "1px solid #333333" : "none" }}>
+                <div className="w-6 h-6 flex items-center justify-center mb-2 text-[10px] font-black" style={{ background: "#F5C220", color: "#0F0F0F" }}>{step}</div>
+                <p className="font-black uppercase tracking-wider mb-1" style={{ color: "#F5F5F5" }}>{title}</p>
+                <p style={{ color: "#888888" }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -326,53 +333,53 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Claude Code / MCP */}
         <Section title="Claude Code & MCP integration" icon={Code2} defaultOpen={false}>
-          <p className="text-sm text-[#9a9aaa]">
-            Connect any OpenClaw agent to <strong className="text-white">Claude Code</strong> or{" "}
-            <strong className="text-white">Claude Desktop</strong> via the Model Context Protocol (MCP).
+          <p className="text-sm" style={{ color: "#888888" }}>
+            Connect any OpenClaw agent to <strong style={{ color: "#F5F5F5" }}>Claude Code</strong> or{" "}
+            <strong style={{ color: "#F5F5F5" }}>Claude Desktop</strong> via the Model Context Protocol (MCP).
             This lets you query your on-chain AI agents directly from within your IDE.
           </p>
 
           <div>
-            <p className="text-xs font-semibold text-white mb-1">
-              Step 1 — Add to <code className="text-[#F3BA2F]">~/.claude/claude_desktop_config.json</code>
+            <p className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: "#F5F5F5" }}>
+              Step 1 — Add to <code style={{ color: "#F5C220" }}>~/.claude/claude_desktop_config.json</code>
             </p>
             <CodeBlock lang="json" code={mcpConfig} />
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-white mb-1">
+            <p className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: "#F5F5F5" }}>
               Step 2 — Query your agent from Claude Code
             </p>
             <CodeBlock lang="bash" code={mcpFetch} />
           </div>
 
-          <div className="bg-[#111118] border border-[#2a2a35] rounded-xl p-4 text-sm space-y-2">
-            <p className="text-[#F3BA2F] font-semibold text-xs">Other AI tool integrations</p>
-            <div className="grid grid-cols-2 gap-2 text-xs text-[#9a9aaa]">
-              <div>✓ <strong className="text-white">Cursor</strong> — use via HTTP request in agent mode</div>
-              <div>✓ <strong className="text-white">LangChain</strong> — wrap as a Tool using requests</div>
-              <div>✓ <strong className="text-white">n8n / Zapier</strong> — HTTP node → POST /api/chat</div>
-              <div>✓ <strong className="text-white">OpenAI Assistants</strong> — use as a function call target</div>
+          <div className="p-4 text-sm space-y-2" style={{ background: "#1A1A1A", border: "1px solid #333333", borderLeft: "3px solid #F5C220" }}>
+            <p className="font-black uppercase tracking-wider text-xs" style={{ color: "#F5C220" }}>Other AI tool integrations</p>
+            <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: "#888888" }}>
+              <div>✓ <strong style={{ color: "#F5F5F5" }}>Cursor</strong> — use via HTTP request in agent mode</div>
+              <div>✓ <strong style={{ color: "#F5F5F5" }}>LangChain</strong> — wrap as a Tool using requests</div>
+              <div>✓ <strong style={{ color: "#F5F5F5" }}>n8n / Zapier</strong> — HTTP node → POST /api/chat</div>
+              <div>✓ <strong style={{ color: "#F5F5F5" }}>OpenAI Assistants</strong> — use as a function call target</div>
             </div>
           </div>
         </Section>
 
         {/* Error codes */}
         <Section title="Error codes" icon={Terminal} defaultOpen={false}>
-          <div className="rounded-xl border border-[#2a2a35] overflow-hidden text-xs font-mono">
+          <div style={{ border: "1px solid #333333", overflow: "hidden" }} className="text-xs font-mono">
             {[
               { code: "400", text: "Bad request — missing or invalid fields" },
               { code: "403", text: "Token gate failed — userAddress holds 0 tokens" },
               { code: "429", text: "Rate limited by upstream AI provider" },
               { code: "500", text: "Internal server error — check API logs" },
             ].map(({ code, text }) => (
-              <div key={code} className="flex gap-4 px-4 py-3 border-b border-[#1e1e28] last:border-0">
-                <span className={`w-10 font-bold flex-shrink-0 ${
-                  code === "403" ? "text-red-400" :
-                  code === "400" ? "text-orange-400" :
-                  code === "429" ? "text-yellow-400" : "text-[#6b7280]"
-                }`}>{code}</span>
-                <span className="text-[#9a9aaa]">{text}</span>
+              <div key={code} className="flex gap-4 px-4 py-3" style={{ borderBottom: "1px solid #222222" }}>
+                <span className="w-10 font-black flex-shrink-0" style={{
+                  color: code === "403" ? "#D62828" :
+                         code === "400" ? "#D62828" :
+                         code === "429" ? "#F5C220" : "#555555"
+                }}>{code}</span>
+                <span style={{ color: "#888888" }}>{text}</span>
               </div>
             ))}
           </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { bscTestnet } from "wagmi/chains";
 import { formatEther } from "viem";
-import { MessageSquare, Send, Cpu, Zap, ChevronRight, CheckSquare, Bot, User, Loader2, AlertCircle, CheckCircle, Radio } from "lucide-react";
+import { MessageSquare, Send, Cpu, Zap, ChevronRight, CheckSquare, Bot, User, Loader2, AlertCircle, Radio } from "lucide-react";
 import { useTokens, type Token } from "../../hooks/useTokens";
 import { ERC20_ABI } from "../../lib/contracts";
 
@@ -74,39 +74,42 @@ function AgentTreeNode({
       <button
         onClick={onSelect}
         disabled={!hasTokens}
-        className={`w-full text-left px-3 py-2.5 rounded-xl border transition-all ${
-          selected
-            ? "border-[#F3BA2F] bg-[#F3BA2F]/10"
-            : hasTokens
-            ? "border-[#2a2a35] bg-[#16161a] hover:border-[#F3BA2F]/40"
-            : "border-[#2a2a35] bg-[#16161a]/50 opacity-40 cursor-not-allowed"
-        }`}
+        className="w-full text-left px-3 py-2.5 transition-all disabled:cursor-not-allowed"
+        style={{
+          border:     selected ? "1px solid #F5C220" : "1px solid #333333",
+          background: selected ? "rgba(245,194,32,0.06)" : "#111111",
+          opacity:    hasTokens ? 1 : 0.4,
+        }}
+        onMouseEnter={e => { if (!selected && hasTokens) (e.currentTarget as HTMLButtonElement).style.borderColor = "#555555"; }}
+        onMouseLeave={e => { if (!selected) (e.currentTarget as HTMLButtonElement).style.borderColor = "#333333"; }}
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F3BA2F]/30 to-purple-600/30 flex items-center justify-center text-sm flex-shrink-0">
+          <div className="w-7 h-7 flex items-center justify-center text-sm flex-shrink-0" style={{ background: "#222222" }}>
             🤖
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-white truncate">{token.name}</p>
-            <p className="text-[10px] text-[#6b7280]">${token.symbol}</p>
+            <p className="text-xs font-black uppercase tracking-wider truncate" style={{ color: "#F5F5F5" }}>{token.name}</p>
+            <p className="text-[10px] font-mono" style={{ color: "#555555" }}>${token.symbol}</p>
           </div>
           <ChevronRight
             size={13}
-            className={`flex-shrink-0 transition-transform ${
-              selected ? "rotate-90 text-[#F3BA2F]" : "text-[#3a3a45]"
-            }`}
+            className="flex-shrink-0 transition-transform"
+            style={{
+              transform: selected ? "rotate(90deg)" : "none",
+              color:     selected ? "#F5C220" : "#444444",
+            }}
           />
         </div>
         <div className="mt-1.5 flex items-center gap-2 text-[10px]">
-          <span className={`font-medium ${hasTokens ? "text-[#F3BA2F]" : "text-[#6b7280]"}`}>
+          <span className="font-mono font-bold" style={{ color: hasTokens ? "#F5C220" : "#555555" }}>
             {Number(formatEther(balance)).toFixed(2)} tokens
           </span>
           {hasTokens && (
-            <span className="text-[#6b7280]">
+            <span style={{ color: "#555555" }}>
               <Zap size={8} className="inline mr-0.5" />{credits} credits
             </span>
           )}
-          {!hasTokens && <span className="text-red-400/80">No tokens</span>}
+          {!hasTokens && <span style={{ color: "#D62828" }}>No tokens</span>}
         </div>
       </button>
 
@@ -115,12 +118,12 @@ function AgentTreeNode({
         <div className="ml-3 mt-1 mb-1">
           {skillsLoading ? (
             <div className="flex items-center gap-2 pl-5 py-2">
-              <Loader2 size={11} className="animate-spin text-[#F3BA2F]" />
-              <span className="text-[10px] text-[#6b7280]">Loading skills…</span>
+              <Loader2 size={11} className="animate-spin" style={{ color: "#F5C220" }} />
+              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#555555" }}>Loading skills…</span>
             </div>
           ) : allSkills.length === 0 ? (
             <div className="pl-5 py-2">
-              <p className="text-[10px] text-[#6b7280] italic">No skill tokens yet</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "#444444" }}>No skill tokens yet</p>
             </div>
           ) : (
             <div className="space-y-0.5">
@@ -132,37 +135,36 @@ function AgentTreeNode({
                   <div key={s.address} className="flex items-stretch">
                     {/* Tree connector */}
                     <div className="flex flex-col items-center w-5 flex-shrink-0">
-                      <div className="w-px flex-1 bg-[#2a2a35]" />
-                      <div className={`w-3 border-b border-[#2a2a35] mt-0 ${ isLast ? "mb-auto" : "" }`} />
-                      {!isLast && <div className="w-px flex-1 bg-[#2a2a35]" />}
+                      <div className="w-px flex-1" style={{ background: "#333333" }} />
+                      <div className="w-3 border-b mt-0" style={{ borderColor: "#333333", ...(isLast ? { marginBottom: "auto" } : {}) }} />
+                      {!isLast && <div className="w-px flex-1" style={{ background: "#333333" }} />}
                     </div>
                     {/* Skill row */}
                     <button
                       onClick={() => owned && onToggleSkill(s.address.toLowerCase())}
                       disabled={!owned}
                       title={owned ? (isActive ? "Deactivate skill" : "Activate skill") : "You don't hold this skill token"}
-                      className={`flex-1 flex items-center gap-2 text-left px-2 py-1.5 rounded-lg text-[11px] transition-colors ${
-                        !owned
-                          ? "opacity-35 cursor-not-allowed"
-                          : isActive
-                          ? "bg-[#F3BA2F]/10 hover:bg-[#F3BA2F]/15"
-                          : "hover:bg-[#2a2a35]"
-                      }`}
+                      className="flex-1 flex items-center gap-2 text-left px-2 py-1.5 text-[11px] transition-colors disabled:cursor-not-allowed"
+                      style={{
+                        opacity:    owned ? 1 : 0.35,
+                        background: isActive ? "rgba(245,194,32,0.06)" : "transparent",
+                        borderLeft: isActive ? "2px solid #F5C220" : "2px solid transparent",
+                      }}
                     >
                       <Zap
                         size={10}
-                        className={`flex-shrink-0 ${
-                          isActive ? "text-[#F3BA2F]" : owned ? "text-[#4a4a55]" : "text-[#2a2a35]"
-                        }`}
+                        className="flex-shrink-0"
+                        style={{ color: isActive ? "#F5C220" : owned ? "#444444" : "#333333" }}
                       />
-                      <span className={`truncate font-medium ${
-                        isActive ? "text-white" : owned ? "text-[#9a9aaa]" : "text-[#5a5a65]"
-                      }`}>
+                      <span
+                        className="truncate font-bold uppercase tracking-wider"
+                        style={{ color: isActive ? "#F5F5F5" : owned ? "#888888" : "#555555" }}
+                      >
                         {s.name}
                       </span>
-                      <span className="text-[9px] text-[#6b7280] ml-auto flex-shrink-0">${s.symbol}</span>
+                      <span className="text-[9px] font-mono ml-auto flex-shrink-0" style={{ color: "#555555" }}>${s.symbol}</span>
                       {isActive && (
-                        <CheckSquare size={10} className="text-[#F3BA2F] flex-shrink-0" />
+                        <CheckSquare size={10} style={{ color: "#F5C220" }} className="flex-shrink-0" />
                       )}
                     </button>
                   </div>
@@ -184,27 +186,33 @@ function ChatBubble({ msg }: { msg: Message }) {
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
       {/* Avatar */}
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-          isUser ? "bg-[#F3BA2F]/20 text-[#F3BA2F]" : "bg-purple-600/20 text-purple-400"
-        }`}
+        className="w-8 h-8 flex items-center justify-center flex-shrink-0"
+        style={{
+          background: isUser ? "#F5C220" : "#222222",
+          color:      isUser ? "#0F0F0F" : "#888888",
+        }}
       >
         {isUser ? <User size={14} /> : <Bot size={14} />}
       </div>
 
       {/* Bubble */}
       <div
-        className={`max-w-[70%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-          isUser
-            ? "bg-[#F3BA2F] text-black rounded-tr-sm"
-            : "bg-[#1e1e26] border border-[#2a2a35] text-[#e0e0e0] rounded-tl-sm"
-        }`}
+        className="max-w-[70%] px-4 py-3 text-sm leading-relaxed"
+        style={isUser ? {
+          background: "#F5C220",
+          color:      "#0F0F0F",
+        } : {
+          background: "#1A1A1A",
+          border:     "1px solid #333333",
+          color:      "#E0E0E0",
+        }}
       >
         {/* Render simple markdown-lite: **bold** and _italic_ */}
         {msg.content.split("\n").map((line, i) => {
           const rendered = line
             .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
             .replace(/_(.+?)_/g, "<em>$1</em>")
-            .replace(/`(.+?)`/g, "<code class='bg-black/30 px-1 rounded text-xs'>$1</code>");
+            .replace(/`(.+?)`/g, "<code style='background:rgba(0,0,0,0.3);padding:0 4px;font-size:11px'>$1</code>");
           return (
             <p
               key={i}
@@ -213,7 +221,7 @@ function ChatBubble({ msg }: { msg: Message }) {
             />
           );
         })}
-        <p className={`text-[10px] mt-2 ${isUser ? "text-black/50" : "text-[#4b5563]"}`}>
+        <p className="text-[10px] mt-2" style={{ color: isUser ? "rgba(0,0,0,0.4)" : "#555555" }}>
           {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </p>
       </div>
@@ -233,8 +241,6 @@ export function ChatPageClient() {
   const agentTokens = useMemo(() => tokens.filter((t) => t.type === "agent"), [tokens]);
 
   // ── Direct on-chain balance fetch ─────────────────────────────────────────
-  // We use publicClient.readContract directly (not useReadContracts) so that
-  // the wallet address is always the live value and there's no wagmi cache drift.
   const [agentBalances, setAgentBalances] = useState<Map<string, bigint>>(new Map());
   const [balancesLoading, setBalancesLoading] = useState(false);
 
@@ -318,7 +324,7 @@ export function ChatPageClient() {
     );
   }, [tokens, selectedAgent?.agentId]);
 
-  const [skillBalances,      setSkillBalances]      = useState<Map<string, bigint>>(new Map());
+  const [skillBalances,        setSkillBalances]        = useState<Map<string, bigint>>(new Map());
   const [skillBalancesLoading, setSkillBalancesLoading] = useState(false);
 
   useEffect(() => {
@@ -530,37 +536,37 @@ export function ChatPageClient() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-[#0e0e11] overflow-hidden">
+    <div className="flex overflow-hidden" style={{ height: "calc(100vh - 64px)", background: "#0F0F0F" }}>
       {/* ── Left sidebar ──────────────────────────────────────────────────── */}
-      <aside className="w-80 flex-shrink-0 border-r border-[#2a2a35] flex flex-col bg-[#0e0e11]">
+      <aside className="w-80 flex-shrink-0 flex flex-col" style={{ background: "#111111", borderRight: "1px solid #333333" }}>
         {/* Header */}
-        <div className="p-4 border-b border-[#2a2a35]">
-          <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-            <Cpu size={14} className="text-[#F3BA2F]" />
+        <div className="p-4" style={{ borderBottom: "1px solid #333333" }}>
+          <h2 className="text-sm font-black uppercase tracking-wider flex items-center gap-2" style={{ color: "#F5F5F5" }}>
+            <Cpu size={14} style={{ color: "#F5C220" }} />
             Your Agents
           </h2>
-          <p className="text-[11px] text-[#6b7280] mt-0.5">Select an agent to chat</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider mt-0.5" style={{ color: "#555555" }}>Select an agent to chat</p>
         </div>
 
         {/* Connection gate */}
         {!isConnected ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 text-center">
-            <MessageSquare size={32} className="text-[#2a2a35]" />
-            <p className="text-sm text-[#6b7280]">Connect your wallet using the button in the top-right navbar.</p>
+            <MessageSquare size={32} style={{ color: "#333333" }} />
+            <p className="text-sm font-bold" style={{ color: "#555555" }}>Connect your wallet using the button in the top-right navbar.</p>
           </div>
         ) : (tokensLoading || (agentTokens.length > 0 && balancesLoading)) ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 size={20} className="animate-spin text-[#F3BA2F]" />
+            <Loader2 size={20} className="animate-spin" style={{ color: "#F5C220" }} />
           </div>
         ) : ownedAgentTokens.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <Bot size={32} className="text-[#2a2a35]" />
-            <p className="text-sm text-[#6b7280]">
+            <Bot size={32} style={{ color: "#333333" }} />
+            <p className="text-sm font-bold" style={{ color: "#555555" }}>
               {agentTokens.length === 0
                 ? "No agent tokens found on BSC Testnet"
                 : "You don't hold any agent tokens yet"}
             </p>
-            <a href="/explore" className="text-xs text-[#F3BA2F] underline underline-offset-2">
+            <a href="/explore" className="text-xs font-black uppercase tracking-wider" style={{ color: "#F5C220" }}>
               Browse agents to buy →
             </a>
           </div>
@@ -588,72 +594,72 @@ export function ChatPageClient() {
       {/* ── Main chat area ─────────────────────────────────────────────────── */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Chat header */}
-        <div className="h-14 border-b border-[#2a2a35] flex items-center justify-between px-5 flex-shrink-0">
+        <div className="h-14 flex items-center justify-between px-5 flex-shrink-0" style={{ borderBottom: "1px solid #333333", background: "#111111" }}>
           {selectedAgent ? (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F3BA2F]/30 to-purple-600/30 flex items-center justify-center">
+              <div className="w-8 h-8 flex items-center justify-center" style={{ background: "#222222" }}>
                 🤖
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">{selectedAgent.name}</p>
-                <p className="text-[11px] text-[#6b7280]">${selectedAgent.symbol}</p>
+                <p className="text-sm font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>{selectedAgent.name}</p>
+                <p className="text-[11px] font-mono" style={{ color: "#555555" }}>${selectedAgent.symbol}</p>
               </div>
               {/* Live-endpoint badge */}
               {agentDbLoading ? (
-                <Loader2 size={11} className="animate-spin text-[#6b7280]" />
+                <Loader2 size={11} className="animate-spin" style={{ color: "#555555" }} />
               ) : agentDb?.status === "deployed" && agentDb.chatUrl ? (
-                <span className="flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[10px] font-medium text-green-400">
+                <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider" style={{ border: "1px solid #4ade80", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
                   <Radio size={8} className="animate-pulse" />
-                  Live endpoint
+                  Live
                 </span>
               ) : agentDb?.status === "deploying" ? (
-                <span className="flex items-center gap-1 rounded-full border border-bnb-yellow/30 bg-bnb-yellow/10 px-2 py-0.5 text-[10px] font-medium text-bnb-yellow">
+                <span className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider" style={{ border: "1px solid #F5C220", color: "#F5C220", background: "rgba(245,194,32,0.06)" }}>
                   <Loader2 size={8} className="animate-spin" />
                   Deploying…
                 </span>
               ) : agentDb ? (
-                <span className="flex items-center gap-1 rounded-full border border-[#2a2a35] bg-[#1e1e26] px-2 py-0.5 text-[10px] text-[#6b7280]">
-                  Fallback mode
+                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ border: "1px solid #333333", color: "#555555" }}>
+                  Fallback
                 </span>
               ) : null}
             </div>
           ) : (
-            <p className="text-sm text-[#6b7280]">No agent selected</p>
+            <p className="text-sm font-bold uppercase tracking-wider" style={{ color: "#444444" }}>No agent selected</p>
           )}
 
           {/* Credit counter */}
           {selectedAgent && agentBalance > 0n && (
-            <div className="flex items-center gap-2 text-xs bg-[#1e1e26] border border-[#2a2a35] rounded-full px-3 py-1.5">
-              <Zap size={11} className="text-[#F3BA2F]" />
-              <span className={creditsRemaining <= 5 ? "text-red-400" : "text-white"}>
+            <div className="flex items-center gap-2 px-3 py-1.5 text-xs" style={{ background: "#222222", border: "1px solid #333333" }}>
+              <Zap size={11} style={{ color: "#F5C220" }} />
+              <span className="font-mono font-bold" style={{ color: creditsRemaining <= 5 ? "#D62828" : "#F5F5F5" }}>
                 {creditsRemaining}
               </span>
-              <span className="text-[#6b7280]">credits</span>
+              <span className="font-bold uppercase tracking-wider" style={{ color: "#555555" }}>credits</span>
             </div>
           )}
         </div>
 
         {/* Messages area */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4" style={{ background: "#0F0F0F" }}>
           {!isConnected ? (
             /* Not connected */
             <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
-              <MessageSquare size={48} className="text-[#2a2a35]" />
-              <h3 className="text-lg font-semibold text-white">Connect to chat</h3>
-              <p className="text-sm text-[#6b7280] max-w-xs">
+              <MessageSquare size={48} style={{ color: "#333333" }} />
+              <h3 className="text-lg font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>Connect to chat</h3>
+              <p className="text-sm font-bold max-w-xs" style={{ color: "#555555" }}>
                 Connect your wallet to access token-gated AI chat with your on-chain agents.
               </p>
-              <p className="text-xs text-[#6b7280]">Use the wallet button in the top navigation bar to connect.</p>
+              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#444444" }}>Use the wallet button in the top navigation bar to connect.</p>
             </div>
           ) : !selectedAgent ? (
             /* No agent selected */
             <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
-              <Bot size={48} className="text-[#2a2a35]" />
-              <h3 className="text-lg font-semibold text-white">Select an agent</h3>
-              <p className="text-sm text-[#6b7280] max-w-xs">
-                Choose an agent from the left panel. You need to hold the agent's token to unlock AI credits.
+              <Bot size={48} style={{ color: "#333333" }} />
+              <h3 className="text-lg font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>Select an agent</h3>
+              <p className="text-sm font-bold max-w-xs" style={{ color: "#555555" }}>
+                Choose an agent from the left panel. You need to hold the agent&apos;s token to unlock AI credits.
                 <br /><br />
-                <strong className="text-[#F3BA2F]">1 token = {CREDITS_PER_TOKEN} AI credits</strong>
+                <strong style={{ color: "#F5C220" }}>1 token = {CREDITS_PER_TOKEN} AI credits</strong>
                 <br />
                 Each message costs {CREDIT_COST} credit.
               </p>
@@ -661,15 +667,16 @@ export function ChatPageClient() {
           ) : agentBalance === 0n ? (
             /* No tokens */
             <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
-              <AlertCircle size={48} className="text-red-500/50" />
-              <h3 className="text-lg font-semibold text-white">No tokens held</h3>
-              <p className="text-sm text-[#6b7280] max-w-xs">
-                You don't hold any <strong className="text-white">{selectedAgent.symbol}</strong> tokens.
+              <AlertCircle size={48} style={{ color: "#D62828", opacity: 0.5 }} />
+              <h3 className="text-lg font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>No tokens held</h3>
+              <p className="text-sm font-bold max-w-xs" style={{ color: "#555555" }}>
+                You don&apos;t hold any <strong style={{ color: "#F5F5F5" }}>{selectedAgent.symbol}</strong> tokens.
                 Buy tokens on the bonding curve to earn AI credits.
               </p>
               <a
                 href={`/token/${selectedAgent.address}`}
-                className="px-4 py-2 bg-[#F3BA2F] text-black text-sm font-semibold rounded-lg hover:bg-[#F3BA2F]/90 transition-colors"
+                className="px-5 py-2.5 text-sm font-black uppercase tracking-wider transition-colors"
+                style={{ background: "#F5C220", color: "#0F0F0F" }}
               >
                 Buy {selectedAgent.symbol} tokens
               </a>
@@ -677,12 +684,12 @@ export function ChatPageClient() {
           ) : messages.length === 0 ? (
             /* Welcome state — agent selected + has tokens */
             <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#F3BA2F]/20 to-purple-600/20 flex items-center justify-center text-3xl">
+              <div className="w-16 h-16 flex items-center justify-center text-3xl" style={{ background: "#222222", border: "1px solid #333333" }}>
                 🤖
               </div>
-              <h3 className="text-lg font-semibold text-white">Chat with {selectedAgent.name}</h3>
-              <p className="text-sm text-[#6b7280] max-w-sm">
-                You have <span className="text-[#F3BA2F] font-semibold">{totalCredits} AI credits</span> from{" "}
+              <h3 className="text-lg font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>Chat with {selectedAgent.name}</h3>
+              <p className="text-sm font-bold max-w-sm" style={{ color: "#555555" }}>
+                You have <span className="font-black" style={{ color: "#F5C220" }}>{totalCredits} AI credits</span> from{" "}
                 {Number(formatEther(agentBalance)).toFixed(4)} tokens.
                 {activeSkills.length > 0 && (
                   <> Active skills: {activeSkills.map((s) => s.name).join(", ")}.</>
@@ -691,13 +698,13 @@ export function ChatPageClient() {
               {activeSkills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 justify-center">
                   {activeSkills.map((s) => (
-                    <span key={s.address} className="text-[11px] bg-purple-600/20 text-purple-300 border border-purple-600/30 rounded-full px-2 py-0.5">
+                    <span key={s.address} className="text-[11px] px-2 py-0.5 font-black uppercase tracking-wider" style={{ background: "rgba(245,194,32,0.1)", border: "1px solid rgba(245,194,32,0.3)", color: "#F5C220" }}>
                       ⚡ {s.name}
                     </span>
                   ))}
                 </div>
               )}
-              <p className="text-xs text-[#4b5563]">Type a message below to start</p>
+              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#444444" }}>Type a message below to start</p>
             </div>
           ) : (
             /* Messages */
@@ -705,14 +712,14 @@ export function ChatPageClient() {
               {messages.map((m) => <ChatBubble key={m.id} msg={m} />)}
               {sending && (
                 <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 flex items-center justify-center flex-shrink-0" style={{ background: "#222222", color: "#888888" }}>
                     <Bot size={14} />
                   </div>
-                  <div className="bg-[#1e1e26] border border-[#2a2a35] rounded-2xl rounded-tl-sm px-4 py-3">
+                  <div className="px-4 py-3" style={{ background: "#1A1A1A", border: "1px solid #333333" }}>
                     <div className="flex gap-1 items-center h-4">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F3BA2F]/60 animate-bounce [animation-delay:0ms]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F3BA2F]/60 animate-bounce [animation-delay:150ms]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F3BA2F]/60 animate-bounce [animation-delay:300ms]" />
+                      <span className="w-1.5 h-1.5 animate-bounce [animation-delay:0ms]" style={{ background: "rgba(245,194,32,0.6)" }} />
+                      <span className="w-1.5 h-1.5 animate-bounce [animation-delay:150ms]" style={{ background: "rgba(245,194,32,0.6)" }} />
+                      <span className="w-1.5 h-1.5 animate-bounce [animation-delay:300ms]" style={{ background: "rgba(245,194,32,0.6)" }} />
                     </div>
                   </div>
                 </div>
@@ -724,9 +731,9 @@ export function ChatPageClient() {
 
         {/* Active skill chips */}
         {activeSkills.length > 0 && selectedAgent && agentBalance > 0n && (
-          <div className="px-6 pb-2 flex flex-wrap gap-1.5">
+          <div className="px-6 pb-2 flex flex-wrap gap-1.5" style={{ background: "#0F0F0F" }}>
             {activeSkills.map((s) => (
-              <span key={s.address} className="text-[11px] bg-purple-600/20 text-purple-300 border border-purple-600/30 rounded-full px-2 py-0.5">
+              <span key={s.address} className="text-[11px] px-2 py-0.5 font-black uppercase tracking-wider" style={{ background: "rgba(245,194,32,0.1)", border: "1px solid rgba(245,194,32,0.3)", color: "#F5C220" }}>
                 ⚡ {s.name}
               </span>
             ))}
@@ -735,20 +742,21 @@ export function ChatPageClient() {
 
         {/* Credit error */}
         {creditError && (
-          <div className="mx-6 mb-2 flex items-center gap-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+          <div className="mx-6 mb-2 flex items-center gap-2 text-xs font-bold px-3 py-2" style={{ color: "#D62828", border: "1px solid rgba(214,40,40,0.4)", background: "rgba(214,40,40,0.06)" }}>
             <AlertCircle size={12} />
             {creditError}
           </div>
         )}
 
         {/* Input area */}
-        <div className="border-t border-[#2a2a35] p-4">
+        <div className="p-4" style={{ borderTop: "1px solid #333333", background: "#111111" }}>
           <div
-            className={`flex gap-3 items-end bg-[#16161a] border rounded-xl px-4 py-3 transition-colors ${
-              selectedAgent && agentBalance > 0n
-                ? "border-[#2a2a35] focus-within:border-[#F3BA2F]/50"
-                : "border-[#2a2a35] opacity-50"
-            }`}
+            className="flex gap-3 items-end px-4 py-3 transition-colors"
+            style={{
+              background: "#1A1A1A",
+              border:     `2px solid ${selectedAgent && agentBalance > 0n ? "#333333" : "#222222"}`,
+              opacity:    selectedAgent && agentBalance > 0n ? 1 : 0.5,
+            }}
           >
             <textarea
               ref={textareaRef}
@@ -768,18 +776,19 @@ export function ChatPageClient() {
               }
               disabled={!isConnected || !selectedAgent || agentBalance === 0n || creditsRemaining <= 0 || sending}
               rows={1}
-              className="flex-1 bg-transparent text-sm text-white placeholder-[#4b5563] resize-none outline-none min-h-[24px] max-h-[120px]"
-              style={{ lineHeight: "1.5" }}
+              className="flex-1 bg-transparent text-sm outline-none resize-none min-h-[24px] max-h-[120px]"
+              style={{ color: "#F5F5F5", lineHeight: "1.5" }}
             />
             <button
               onClick={sendMessage}
               disabled={!input.trim() || !selectedAgent || agentBalance === 0n || creditsRemaining < CREDIT_COST || sending}
-              className="w-8 h-8 rounded-lg bg-[#F3BA2F] text-black flex items-center justify-center transition-all hover:bg-[#F3BA2F]/90 disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+              className="w-8 h-8 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+              style={{ background: "#F5C220", color: "#0F0F0F" }}
             >
               {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
             </button>
           </div>
-          <p className="text-[10px] text-[#4b5563] mt-1.5 text-right">
+          <p className="text-[10px] font-bold uppercase tracking-widest mt-1.5 text-right" style={{ color: "#444444" }}>
             1 token = {CREDITS_PER_TOKEN} credits · {CREDIT_COST} credit/message
           </p>
         </div>

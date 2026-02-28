@@ -6,38 +6,39 @@ import { ParticleBg } from "../components/ParticleBg";
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden pb-16 pt-20 text-center">
-      {/* Particle / orb background layer */}
+    <section className="relative overflow-hidden pb-16 pt-20" style={{ borderBottom: "1px solid #333333" }}>
       <ParticleBg />
 
-      {/* Content sits above particles */}
       <div className="relative z-10 mx-auto max-w-4xl px-4">
 
-        {/* Live badge */}
-        <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-bnb-yellow/30 bg-bnb-yellow/8 px-5 py-2 text-sm font-medium text-bnb-yellow shadow-glow-sm"
-          style={{ background: "rgba(243,186,47,0.06)" }}
+        {/* Live badge — flat rectangular */}
+        <div
+          className="mb-8 inline-flex items-center gap-2.5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest"
+          style={{ background: "#F5C220", color: "#0F0F0F" }}
         >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-bnb-yellow opacity-70" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-bnb-yellow" />
-          </span>
+          <span className="h-1.5 w-1.5" style={{ background: "#0F0F0F" }} />
           Live on BNB Chain Testnet
-          <span className="rounded-full bg-bnb-yellow/20 px-2 py-0.5 text-xs font-bold">BETA</span>
+          <span
+            className="px-1.5 py-0.5 text-[10px] font-black"
+            style={{ background: "#0F0F0F", color: "#F5C220" }}
+          >
+            BETA
+          </span>
         </div>
 
         {/* Main heading */}
         <h1
-          className="mb-6 text-5xl font-extrabold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl animate-slide-up"
-          style={{ animationDelay: "0.1s" }}
+          className="mb-6 text-5xl font-black leading-[1.05] tracking-tight md:text-6xl lg:text-7xl animate-slide-up"
+          style={{ animationDelay: "0.1s", letterSpacing: "-0.02em" }}
         >
-          <span className="text-white">Launch Your</span>
+          <span style={{ color: "#F5F5F5" }}>Launch Your</span>
           <br />
-          <span className="shimmer-text">Token on BNB Chain</span>
+          <span style={{ color: "#F5C220" }}>Token on BNB Chain</span>
         </h1>
 
         <p
-          className="mb-10 mx-auto max-w-2xl text-base text-gray-400 md:text-lg leading-relaxed animate-slide-up"
-          style={{ animationDelay: "0.2s" }}
+          className="mb-10 mx-auto max-w-2xl text-base leading-relaxed animate-slide-up"
+          style={{ animationDelay: "0.2s", color: "#888888" }}
         >
           The most powerful AI-native token launchpad. Deploy agents, tokens, and skill modules
           with built-in bonding curves, reputation scoring, and DeFi growth tools.
@@ -45,54 +46,58 @@ function HeroSection() {
 
         {/* CTA buttons */}
         <div
-          className="flex flex-wrap items-center justify-center gap-4 animate-slide-up"
+          className="flex flex-wrap items-center gap-4 animate-slide-up"
           style={{ animationDelay: "0.3s" }}
         >
           <Link
             href="/launch"
-            className="btn-neon flex items-center gap-2.5 rounded-2xl px-8 py-3.5 text-base"
+            className="btn-neon flex items-center gap-2.5 px-8 py-3.5 text-sm"
           >
-            <Rocket size={18} />
+            <Rocket size={16} />
             Create Token
           </Link>
           <Link
             href="/explore"
-            className="btn-outline-neon flex items-center gap-2.5 rounded-2xl px-8 py-3.5 text-base font-semibold"
+            className="btn-outline-neon flex items-center gap-2.5 px-8 py-3.5 text-sm"
           >
             Explore Tokens
-            <ChevronRight size={16} />
+            <ChevronRight size={14} />
           </Link>
         </div>
 
-        {/* Feature pills */}
+        {/* Feature pills — flat rectangles */}
         <div
-          className="mt-14 flex flex-wrap items-center justify-center gap-3 animate-slide-up"
+          className="mt-14 flex flex-wrap items-center gap-3 animate-slide-up"
           style={{ animationDelay: "0.4s" }}
         >
           {[
-            { icon: Bot,       label: "AI Agents",        desc: "NFA-grade AI", color: "text-purple-400 border-purple-400/25 bg-purple-400/8" },
-            { icon: Coins,     label: "Fair-launch",       desc: "Bonding curves", color: "text-bnb-yellow border-bnb-yellow/25 bg-bnb-yellow/8" },
-            { icon: Puzzle,    label: "Skill Tokens",      desc: "Modular AI", color: "text-green-400 border-green-400/25 bg-green-400/8" },
-            { icon: Shield,    label: "Reputation",        desc: "On-chain trust", color: "text-blue-400 border-blue-400/25 bg-blue-400/8" },
-            { icon: TrendingUp,label: "Auto-DEX listing",  desc: "Uniswap V3", color: "text-cyan-400 border-cyan-400/25 bg-cyan-400/8" },
-          ].map(({ icon: Icon, label, desc, color }) => (
+            { icon: Bot,       label: "AI Agents",       accentColor: "#1B4EF8" },
+            { icon: Coins,     label: "Fair-launch",      accentColor: "#F5C220" },
+            { icon: Puzzle,    label: "Skill Tokens",     accentColor: "#D62828" },
+            { icon: Shield,    label: "Reputation",       accentColor: "#1B4EF8" },
+            { icon: TrendingUp,label: "Auto-DEX listing", accentColor: "#F5C220" },
+          ].map(({ icon: Icon, label, accentColor }) => (
             <div
               key={label}
-              className={`flex items-center gap-2.5 rounded-full border px-4 py-2 text-sm transition-all hover:scale-105 ${color}`}
-              style={{ backdropFilter: "blur(8px)" }}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold"
+              style={{
+                background: "#1A1A1A",
+                border: `1px solid #333333`,
+                borderLeft: `3px solid ${accentColor}`,
+                color: "#F5F5F5",
+              }}
             >
-              <Icon size={14} />
-              <span className="font-medium">{label}</span>
-              <span className="text-gray-500 text-xs hidden sm:inline">· {desc}</span>
+              <Icon size={13} style={{ color: accentColor }} />
+              <span>{label}</span>
             </div>
           ))}
         </div>
 
-        {/* Decorative horizontal rule */}
-        <div className="mt-14 flex items-center justify-center gap-4">
-          <div className="h-px flex-1 max-w-32" style={{ background: "linear-gradient(90deg, transparent, rgba(243,186,47,0.3))" }} />
-          <Zap size={14} className="text-bnb-yellow/50" />
-          <div className="h-px flex-1 max-w-32" style={{ background: "linear-gradient(90deg, rgba(243,186,47,0.3), transparent)" }} />
+        {/* Geometric divider */}
+        <div className="mt-14 flex items-center gap-3">
+          <div className="h-px flex-1 max-w-24" style={{ background: "#333333" }} />
+          <div className="h-2 w-2" style={{ background: "#F5C220" }} />
+          <div className="h-px flex-1 max-w-24" style={{ background: "#333333" }} />
         </div>
       </div>
     </section>
@@ -108,4 +113,3 @@ export default function HomePage() {
     </>
   );
 }
-

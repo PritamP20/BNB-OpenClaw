@@ -34,23 +34,23 @@ function PriceTooltip({ active, payload }: { active?: boolean; payload?: Array<{
   const d = payload[0]?.payload;
   if (!d) return null;
   return (
-    <div className="rounded-xl border border-bnb-yellow/10 bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
-      <p className="mb-1.5 text-gray-500">
+    <div className="p-3 text-xs" style={{ background: "#222222", border: "1px solid #333333" }}>
+      <p className="mb-1.5" style={{ color: "#555555" }}>
         {new Date(d.time).toLocaleString([], {
           month: "short", day: "numeric",
           hour: "2-digit", minute: "2-digit",
         })}
       </p>
-      <p className="font-mono text-base font-bold text-white">{fmtUSD(d.priceUSD)}</p>
-      <p className="text-gray-500">{d.price.toFixed(12)} BNB</p>
-      <div className="mt-2 flex gap-3 border-t border-white/5 pt-2">
+      <p className="font-mono text-base font-black" style={{ color: "#F5F5F5" }}>{fmtUSD(d.priceUSD)}</p>
+      <p style={{ color: "#555555" }}>{d.price.toFixed(12)} BNB</p>
+      <div className="mt-2 flex gap-3 pt-2" style={{ borderTop: "1px solid #333333" }}>
         <div>
-          <p className="text-gray-600">High</p>
-          <p className="font-mono text-green-400">{fmtUSD(d.high)}</p>
+          <p style={{ color: "#555555" }}>High</p>
+          <p className="font-mono font-bold" style={{ color: "#4ade80" }}>{fmtUSD(d.high)}</p>
         </div>
         <div>
-          <p className="text-gray-600">Low</p>
-          <p className="font-mono text-red-400">{fmtUSD(d.low)}</p>
+          <p style={{ color: "#555555" }}>Low</p>
+          <p className="font-mono font-bold" style={{ color: "#D62828" }}>{fmtUSD(d.low)}</p>
         </div>
       </div>
     </div>
@@ -63,13 +63,13 @@ function VolumeTooltip({ active, payload }: { active?: boolean; payload?: Array<
   if (!d) return null;
   const total = d.buyVol + d.sellVol;
   return (
-    <div className="rounded-xl border border-bnb-yellow/10 bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
-      <p className="font-mono font-bold text-white">
+    <div className="p-3 text-xs" style={{ background: "#222222", border: "1px solid #333333" }}>
+      <p className="font-mono font-bold" style={{ color: "#F5F5F5" }}>
         {fmtUSD(total, true)} vol
       </p>
       <div className="mt-1 flex gap-3">
-        <span className="text-green-400">Buy {fmtUSD(d.buyVol, true)}</span>
-        <span className="text-red-400">Sell {fmtUSD(d.sellVol, true)}</span>
+        <span style={{ color: "#4ade80" }}>Buy {fmtUSD(d.buyVol, true)}</span>
+        <span style={{ color: "#D62828" }}>Sell {fmtUSD(d.sellVol, true)}</span>
       </div>
     </div>
   );
@@ -106,9 +106,9 @@ export function PriceChart({ token }: { token: MockToken }) {
   // ── Loading state ──────────────────────────────────────────────────────────
   if (tokenAddress && loading && !fetched) {
     return (
-      <div className="flex h-80 items-center justify-center gap-3 text-gray-500">
-        <Loader2 className="h-5 w-5 animate-spin text-bnb-yellow" />
-        <span className="text-sm">Loading price data…</span>
+      <div className="flex h-80 items-center justify-center gap-3" style={{ color: "#555555" }}>
+        <Loader2 className="h-5 w-5 animate-spin" style={{ color: "#F5C220" }} />
+        <span className="text-sm font-bold uppercase tracking-wider">Loading price data…</span>
       </div>
     );
   }
@@ -116,10 +116,13 @@ export function PriceChart({ token }: { token: MockToken }) {
   // ── Empty state (token on-chain, curve found, but no trades yet) ───────────
   if (tokenAddress && fetched && curveFound && data.length === 0) {
     return (
-      <div className="flex h-80 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-bnb-yellow/10 text-center">
-        <TrendingUp className="h-8 w-8 text-bnb-yellow/50" />
-        <p className="text-sm font-medium text-gray-400">No trades yet</p>
-        <p className="max-w-xs text-xs text-gray-600">
+      <div
+        className="flex h-80 flex-col items-center justify-center gap-3 text-center"
+        style={{ border: "1px solid #333333" }}
+      >
+        <TrendingUp className="h-8 w-8" style={{ color: "#333333" }} />
+        <p className="text-sm font-black uppercase tracking-wider" style={{ color: "#888888" }}>No trades yet</p>
+        <p className="max-w-xs text-xs font-bold uppercase tracking-wider" style={{ color: "#444444" }}>
           Be the first to buy — price history will appear here once trading starts.
         </p>
       </div>
@@ -131,38 +134,39 @@ export function PriceChart({ token }: { token: MockToken }) {
       {/* Current price + stats row */}
       <div className="mb-4 flex flex-wrap items-end gap-4">
         <div>
-          <p className="text-3xl font-extrabold tracking-tight text-white">
+          <p className="text-3xl font-black tracking-tight" style={{ color: "#F5F5F5" }}>
             {fmtUSD(currentPrice)}
           </p>
-          <p className="mt-0.5 font-mono text-xs text-gray-500">
+          <p className="mt-0.5 font-mono text-xs" style={{ color: "#555555" }}>
             {token.price.toFixed(12)} BNB
           </p>
         </div>
         <div className="flex flex-wrap gap-4 pb-0.5 text-sm">
-          <span className={`font-semibold ${isUp ? "text-green-400" : "text-red-400"}`}>
+          <span className="font-bold" style={{ color: isUp ? "#4ade80" : "#D62828" }}>
             {isUp ? "▲" : "▼"} {Math.abs(stats.priceChange).toFixed(2)}%
           </span>
-          <span className="text-gray-500">
-            H <span className="text-white">{fmtUSD(stats.high)}</span>
+          <span style={{ color: "#555555" }}>
+            H <span style={{ color: "#F5F5F5" }}>{fmtUSD(stats.high)}</span>
           </span>
-          <span className="text-gray-500">
-            L <span className="text-white">{fmtUSD(stats.low)}</span>
+          <span style={{ color: "#555555" }}>
+            L <span style={{ color: "#F5F5F5" }}>{fmtUSD(stats.low)}</span>
           </span>
-          <span className="text-gray-500">
-            Vol <span className="text-white">{fmtUSD(stats.volumeUSD, true)}</span>
+          <span style={{ color: "#555555" }}>
+            Vol <span style={{ color: "#F5F5F5" }}>{fmtUSD(stats.volumeUSD, true)}</span>
           </span>
         </div>
         {/* Range tabs */}
-        <div className="ml-auto flex gap-0.5 rounded-lg border border-bnb-yellow/10 bg-black/40 p-0.5">
+        <div className="ml-auto flex" style={{ border: "1px solid #333333" }}>
           {RANGES.map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-                range === r
-                  ? "bg-bnb-yellow text-black"
-                  : "text-gray-500 hover:text-white"
-              }`}
+              className="px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-colors"
+              style={{
+                background: range === r ? "#F5C220" : "#1A1A1A",
+                color: range === r ? "#0F0F0F" : "#555555",
+                borderRight: "1px solid #333333",
+              }}
             >
               {r}
             </button>
@@ -182,21 +186,21 @@ export function PriceChart({ token }: { token: MockToken }) {
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#2a2a35"
+              stroke="#333333"
               vertical={false}
             />
             <XAxis
               dataKey="time"
               tickFormatter={(v) => fmtAxisTime(v, range)}
-              tick={{ fill: "#6b7280", fontSize: 11 }}
-              axisLine={{ stroke: "#2a2a35" }}
+              tick={{ fill: "#555555", fontSize: 10, fontWeight: 700 }}
+              axisLine={{ stroke: "#333333" }}
               tickLine={false}
               minTickGap={60}
             />
             <YAxis
               domain={[minPrice, maxPrice]}
               tickFormatter={(v) => fmtUSD(v)}
-              tick={{ fill: "#6b7280", fontSize: 11 }}
+              tick={{ fill: "#555555", fontSize: 10, fontWeight: 700 }}
               axisLine={false}
               tickLine={false}
               width={72}

@@ -62,7 +62,8 @@ export function Navbar() {
       <button
         onClick={() => switchChain({ chainId: bscTestnet.id })}
         disabled={isSwitching}
-        className="flex items-center gap-2 rounded-xl border border-orange-400/50 bg-orange-400/10 px-4 py-2 text-sm font-semibold text-orange-300 transition-all hover:bg-orange-400/20 hover:shadow-[0_0_16px_rgba(251,146,60,0.3)] disabled:opacity-60"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider disabled:opacity-60"
+        style={{ background: "transparent", border: "2px solid #D62828", color: "#D62828" }}
       >
         {isSwitching ? <Loader2 size={13} className="animate-spin" /> : <AlertTriangle size={13} />}
         {isSwitching ? "Switching…" : "Wrong Network"}
@@ -73,26 +74,29 @@ export function Navbar() {
       <div className="relative">
         <button
           onClick={() => setShowDropdown((o) => !o)}
-          className="flex items-center gap-2 rounded-xl border border-bnb-yellow/30 bg-bnb-yellow/8 px-4 py-2 text-sm font-semibold text-bnb-yellow transition-all hover:border-bnb-yellow/60 hover:bg-bnb-yellow/15 hover:shadow-[0_0_16px_rgba(243,186,47,0.2)]"
-          style={{ background: "rgba(243,186,47,0.06)" }}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider"
+          style={{ background: "#1A1A1A", border: "2px solid #F5C220", color: "#F5C220" }}
         >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
-          </span>
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#4ade80" }} />
           {shortAddr}
-          <ChevronDown size={13} className={`transition-transform ${showDropdown ? "rotate-180" : ""}`} />
+          <ChevronDown size={12} className={`transition-transform ${showDropdown ? "rotate-180" : ""}`} />
         </button>
         {showDropdown && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setShowDropdown(false)} />
-            <div className="absolute right-0 top-full z-20 mt-2 w-48 rounded-2xl border border-bnb-yellow/20 glass/95 p-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.7),0_0_12px_rgba(243,186,47,0.1)] backdrop-blur-xl">
-              <div className="border-b border-white/5 px-3 py-2 text-[11px] text-gray-500">
+            <div
+              className="absolute right-0 top-full z-20 mt-1 w-48 p-1"
+              style={{ background: "#1A1A1A", border: "1px solid #333333" }}
+            >
+              <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#555555", borderBottom: "1px solid #333333" }}>
                 BSC Testnet
               </div>
               <button
                 onClick={() => { disconnect(); setShowDropdown(false); }}
-                className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-red-400 transition-colors hover:bg-red-400/10"
+                className="mt-1 w-full px-3 py-2 text-left text-sm font-bold uppercase tracking-wider transition-colors"
+                style={{ color: "#D62828" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(214,40,40,0.08)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
                 Disconnect
               </button>
@@ -103,7 +107,7 @@ export function Navbar() {
     );
   } else if (isPending) {
     walletBtn = (
-      <button disabled className="flex items-center gap-2 rounded-xl bg-bnb-yellow/70 px-4 py-2 text-sm font-bold text-black">
+      <button disabled className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider" style={{ background: "#F5C220", color: "#0F0F0F", opacity: 0.7 }}>
         <Loader2 size={14} className="animate-spin" /> Connecting…
       </button>
     );
@@ -113,7 +117,7 @@ export function Navbar() {
         href="https://metamask.io/download/"
         target="_blank"
         rel="noopener noreferrer"
-        className="btn-outline-neon flex items-center gap-2 rounded-xl px-4 py-2 text-sm"
+        className="btn-outline-neon flex items-center gap-2 px-4 py-2 text-sm"
       >
         <Wallet size={14} /> Install MetaMask
       </a>
@@ -122,7 +126,7 @@ export function Navbar() {
     walletBtn = (
       <button
         onClick={handleConnect}
-        className="btn-neon flex items-center gap-2 rounded-xl px-5 py-2 text-sm"
+        className="btn-neon flex items-center gap-2 px-5 py-2 text-sm"
       >
         <Wallet size={14} />
         Connect Wallet
@@ -131,112 +135,107 @@ export function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50">
-      {/* Glowing top border line */}
-      <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(243,186,47,0.5) 30%, rgba(243,186,47,0.8) 50%, rgba(243,186,47,0.5) 70%, transparent)" }} />
+    <nav className="sticky top-0 z-50" style={{ background: "#0F0F0F", borderBottom: "2px solid #222222" }}>
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
 
-      <div
-        className="border-b border-bnb-yellow/10 backdrop-blur-2xl"
-        style={{ background: "rgba(8,8,12,0.88)", backdropFilter: "blur(24px) saturate(1.4)" }}
-      >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-
-          {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2.5">
-            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-bnb-yellow to-bnb-yellow-dim shadow-glow-sm transition-all group-hover:shadow-glow-md">
-              {/* Scan-line shimmer on logo */}
-              <div className="absolute inset-0 overflow-hidden rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="h-full w-0.5 bg-white/30" style={{ animation: "streak 1.5s linear infinite" }} />
-              </div>
-              <Zap size={17} strokeWidth={2.5} className="relative z-10 text-black" />
-            </div>
-            <div>
-              <span className="text-lg font-extrabold tracking-tight text-white">
-                Agent<span className="shimmer-text">Launch</span>
-              </span>
-              <div className="text-[9px] font-semibold tracking-widest text-bnb-yellow/60 uppercase -mt-0.5">
-                BNB Chain
-              </div>
-            </div>
-          </Link>
-
-          {/* Desktop nav */}
-          <div className="hidden items-center gap-1 md:flex">
-            {navLinks.map(({ href, label, icon: Icon }) => {
-              const active = pathname === href;
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`relative flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
-                    active
-                      ? "text-bnb-yellow"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  {active && (
-                    <span className="absolute inset-0 rounded-xl bg-bnb-yellow/10 border border-bnb-yellow/20" />
-                  )}
-                  <Icon size={15} className="relative z-10" />
-                  <span className="relative z-10">{label}</span>
-                  {active && (
-                    <span className="relative z-10 h-1 w-1 rounded-full bg-bnb-yellow animate-pulse-slow ml-0.5" />
-                  )}
-                </Link>
-              );
-            })}
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5">
+          {/* Bauhaus geometric logo mark */}
+          <div
+            className="flex h-8 w-8 items-center justify-center"
+            style={{ background: "#F5C220" }}
+          >
+            <Zap size={16} strokeWidth={3} style={{ color: "#0F0F0F" }} />
           </div>
-
-          {/* Right side */}
-          <div className="flex items-center gap-3">
-            {/* BNB Chain badge */}
-            <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-bnb-yellow/20 bg-bnb-yellow/5 px-3 py-1 text-[11px] font-medium text-bnb-yellow/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-bnb-yellow animate-pulse-slow" />
-              Testnet
+          <div>
+            <span className="text-base font-black tracking-tight uppercase" style={{ color: "#F5F5F5", letterSpacing: "-0.01em" }}>
+              Agent<span style={{ color: "#F5C220" }}>Launch</span>
+            </span>
+            <div className="text-[8px] font-black tracking-[0.25em] uppercase -mt-0.5" style={{ color: "#555555" }}>
+              BNB Chain
             </div>
-
-            {walletBtn}
-
-            <button
-              className="rounded-xl border border-white/10 p-2 text-gray-400 hover:border-white/20 hover:text-white transition-colors md:hidden"
-              onClick={() => setMobileOpen((o) => !o)}
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-            </button>
           </div>
-        </div>
+        </Link>
 
-        {/* Error banner */}
-        {connectError && !isConnected && !isPending && (
-          <div className="border-t border-red-500/20 bg-red-500/8 px-4 py-2 text-center text-xs text-red-400">
-            {connectError.message.includes("rejected") || connectError.message.includes("denied")
-              ? "Connection cancelled."
-              : `Could not connect: ${connectError.message}`}
-          </div>
-        )}
-
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <div className="border-t border-bnb-yellow/10 px-4 py-3 md:hidden">
-            {navLinks.map(({ href, label, icon: Icon }) => (
+        {/* Desktop nav */}
+        <div className="hidden items-center md:flex" style={{ gap: "1px", background: "#222222" }}>
+          {navLinks.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href;
+            return (
               <Link
                 key={href}
                 href={href}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                  pathname === href
-                    ? "bg-bnb-yellow/10 text-bnb-yellow border border-bnb-yellow/20"
-                    : "text-gray-400 hover:text-white"
-                }`}
+                className="relative flex items-center gap-1.5 px-5 py-4 text-sm font-bold uppercase tracking-wider transition-colors"
+                style={{
+                  color: active ? "#F5C220" : "#888888",
+                  background: active ? "#1A1A1A" : "transparent",
+                  borderBottom: active ? "2px solid #F5C220" : "2px solid transparent",
+                }}
               >
-                <Icon size={15} />
-                {label}
+                <Icon size={14} />
+                <span>{label}</span>
               </Link>
-            ))}
+            );
+          })}
+        </div>
+
+        {/* Right side */}
+        <div className="flex items-center gap-3">
+          {/* Network badge */}
+          <div
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest"
+            style={{ background: "#1A1A1A", border: "1px solid #333333", color: "#888888" }}
+          >
+            <span className="h-1.5 w-1.5" style={{ background: "#4ade80" }} />
+            Testnet
           </div>
-        )}
+
+          {walletBtn}
+
+          <button
+            className="p-2 transition-colors md:hidden"
+            style={{ border: "1px solid #333333", color: "#888888" }}
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
       </div>
+
+      {/* Error banner */}
+      {connectError && !isConnected && !isPending && (
+        <div
+          className="px-4 py-2 text-center text-xs font-bold uppercase tracking-wider"
+          style={{ background: "rgba(214,40,40,0.12)", borderTop: "1px solid rgba(214,40,40,0.3)", color: "#D62828" }}
+        >
+          {connectError.message.includes("rejected") || connectError.message.includes("denied")
+            ? "Connection cancelled."
+            : `Could not connect: ${connectError.message}`}
+        </div>
+      )}
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden" style={{ borderTop: "1px solid #222222", background: "#0F0F0F" }}>
+          {navLinks.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2.5 px-4 py-3 text-sm font-bold uppercase tracking-wider transition-colors"
+              style={{
+                color: pathname === href ? "#F5C220" : "#888888",
+                background: pathname === href ? "#1A1A1A" : "transparent",
+                borderLeft: pathname === href ? "3px solid #F5C220" : "3px solid transparent",
+              }}
+            >
+              <Icon size={14} />
+              {label}
+            </Link>
+          ))}
+        </div>
+      )}
     </nav>
   );
 }

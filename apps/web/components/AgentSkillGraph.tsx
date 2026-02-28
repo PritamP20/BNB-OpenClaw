@@ -143,19 +143,16 @@ export function AgentSkillGraph({
   const selectedSkill = selected !== null ? skills[selected] : null;
 
   return (
-    <div className="rounded-2xl border border-bnb-yellow/10 glass overflow-hidden">
-      {/* Top accent bar */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
-
+    <div style={{ border: "1px solid #333333", borderTop: "3px solid #1B4EF8", background: "#1A1A1A", overflow: "hidden" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 border border-purple-500/20">
-            <Cpu size={14} className="text-purple-400" />
+          <div className="flex h-8 w-8 items-center justify-center" style={{ background: "#222222", border: "1px solid #333333" }}>
+            <Cpu size={14} style={{ color: "#1B4EF8" }} />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white">Skill Graph</h3>
-            <p className="text-[11px] text-gray-600 mt-px">
+            <h3 className="text-sm font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>Skill Graph</h3>
+            <p className="text-[11px] font-bold mt-px" style={{ color: "#555555" }}>
               {n > 0
                 ? `${n} skill module${n !== 1 ? "s" : ""} connected`
                 : "No skills deployed yet"}
@@ -165,13 +162,13 @@ export function AgentSkillGraph({
         {n > 0 && (
           <div className="flex items-center gap-2">
             {userAddress && (
-              <div className="flex items-center gap-1.5 rounded-full border border-green-500/20 bg-green-500/5 px-2.5 py-1 text-[11px]">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-                <span className="font-mono text-green-400">{skills.filter((s) => s.hasAccess).length}</span>
-                <span className="text-gray-600">/ {n} unlocked</span>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 text-[11px]" style={{ border: "1px solid rgba(74,222,128,0.3)", background: "rgba(74,222,128,0.04)" }}>
+                <span className="h-1.5 w-1.5" style={{ background: "#4ade80" }} />
+                <span className="font-mono font-bold" style={{ color: "#4ade80" }}>{skills.filter((s) => s.hasAccess).length}</span>
+                <span className="font-bold uppercase tracking-wider" style={{ color: "#555555" }}>/ {n} unlocked</span>
               </div>
             )}
-            <div className="rounded-full border border-bnb-yellow/15 bg-bnb-yellow/5 px-2.5 py-1 text-[11px] font-mono text-bnb-yellow/70">
+            <div className="px-2.5 py-1 text-[11px] font-mono font-bold" style={{ border: "1px solid #333333", color: "#888888" }}>
               {n} skill{n !== 1 ? "s" : ""}
             </div>
           </div>
@@ -181,20 +178,19 @@ export function AgentSkillGraph({
       {/* Empty state */}
       {n === 0 ? (
         <div className="flex flex-col items-center gap-4 py-14 px-6">
-          <div className="relative flex h-20 w-20 items-center justify-center">
-            <div className="absolute inset-0 rounded-full border border-purple-400/20 animate-pulse" />
-            <div className="absolute inset-3 rounded-full border border-bnb-yellow/10" />
+          <div className="flex h-20 w-20 items-center justify-center" style={{ background: "#222222", border: "1px solid #333333" }}>
             <span className="text-3xl">🤖</span>
           </div>
           <div className="text-center">
-            <p className="text-sm font-semibold text-gray-200">{agentName}</p>
-            <p className="mt-1 text-xs text-gray-600 max-w-xs">
+            <p className="text-sm font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>{agentName}</p>
+            <p className="mt-1 text-xs font-bold max-w-xs" style={{ color: "#555555" }}>
               No skill modules attached yet. Developers can deploy skill tokens to extend this agent&apos;s capabilities.
             </p>
           </div>
           <Link
             href="/launch"
-            className="flex items-center gap-1.5 rounded-full border border-bnb-yellow/30 bg-bnb-yellow/10 px-4 py-1.5 text-xs font-semibold text-bnb-yellow hover:bg-bnb-yellow/20 transition-all"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-black uppercase tracking-wider transition-all"
+            style={{ border: "1px solid #F5C220", color: "#F5C220", background: "rgba(245,194,32,0.06)" }}
           >
             <Zap size={11} /> Deploy a Skill Module
           </Link>
@@ -202,7 +198,7 @@ export function AgentSkillGraph({
       ) : (
         <>
           {/* SVG Graph */}
-          <div className="relative mx-4 mb-0 overflow-hidden rounded-xl border border-white/[0.04] bg-[#060609]">
+          <div className="relative mx-4 mb-0 overflow-hidden" style={{ border: "1px solid #222222", background: "#0F0F0F" }}>
             <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: 310 }}>
               <defs>
                 <radialGradient id="sgAgentGlow" cx="50%" cy="50%" r="50%">
@@ -358,61 +354,62 @@ export function AgentSkillGraph({
 
           {/* Selected skill detail panel */}
           {selectedSkill ? (
-            <div className="mx-4 mt-3 mb-4 rounded-xl border border-bnb-yellow/20 bg-gradient-to-br from-bnb-yellow/[0.04] to-purple-500/[0.03] p-4">
+            <div className="mx-4 mt-3 mb-4 p-4" style={{ border: "1px solid #333333", borderLeft: "3px solid #F5C220", background: "#111111" }}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-bnb-yellow/15 glass text-xl shadow-[0_0_12px_rgba(243,186,47,0.15)]">
+                  <div className="flex h-11 w-11 items-center justify-center text-xl" style={{ background: "#222222", border: "1px solid #333333" }}>
                     {getSkillIcon(selectedSkill.symbol)}
                   </div>
                   <div>
-                    <p className="font-semibold text-white leading-tight">{selectedSkill.name}</p>
-                    <p className="text-[11px] text-gray-500 mt-0.5 font-mono">${selectedSkill.symbol}</p>
+                    <p className="font-black uppercase tracking-wider" style={{ color: "#F5F5F5" }}>{selectedSkill.name}</p>
+                    <p className="text-[11px] font-mono mt-0.5" style={{ color: "#555555" }}>${selectedSkill.symbol}</p>
                   </div>
                 </div>
                 {!userAddress ? (
-                  <span className="text-[11px] text-gray-600 mt-1">Connect wallet to check access</span>
+                  <span className="text-[11px] font-bold mt-1" style={{ color: "#555555" }}>Connect wallet to check access</span>
                 ) : selectedSkill.hasAccess ? (
-                  <span className="flex items-center gap-1 rounded-full bg-green-500/10 border border-green-500/20 px-2.5 py-0.5 text-[11px] font-semibold text-green-400">
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider" style={{ border: "1px solid rgba(74,222,128,0.4)", color: "#4ade80", background: "rgba(74,222,128,0.06)" }}>
                     <Unlock size={9} /> Unlocked
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 rounded-full bg-red-500/10 border border-red-500/20 px-2.5 py-0.5 text-[11px] font-semibold text-red-400">
+                  <span className="flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider" style={{ border: "1px solid rgba(214,40,40,0.4)", color: "#D62828", background: "rgba(214,40,40,0.06)" }}>
                     <Lock size={9} /> Locked
                   </span>
                 )}
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded-lg glass border border-white/[0.05] p-2.5">
-                  <p className="text-gray-600">Cost Per Use</p>
-                  <p className="mt-0.5 font-mono font-bold text-white">
+                <div className="p-2.5" style={{ background: "#222222", border: "1px solid #333333" }}>
+                  <p className="font-bold uppercase tracking-wider" style={{ color: "#555555" }}>Cost Per Use</p>
+                  <p className="mt-0.5 font-mono font-bold" style={{ color: "#F5F5F5" }}>
                     {selectedSkill.costPerUse === 0n
                       ? "Free"
                       : `${parseFloat(formatEther(selectedSkill.costPerUse)).toFixed(4)} ${selectedSkill.symbol}`}
                   </p>
                 </div>
-                <div className="rounded-lg glass border border-white/[0.05] p-2.5">
-                  <p className="text-gray-600">Contract</p>
-                  <p className="mt-0.5 font-mono text-gray-400 truncate text-[10px]">
+                <div className="p-2.5" style={{ background: "#222222", border: "1px solid #333333" }}>
+                  <p className="font-bold uppercase tracking-wider" style={{ color: "#555555" }}>Contract</p>
+                  <p className="mt-0.5 font-mono truncate text-[10px]" style={{ color: "#888888" }}>
                     {selectedSkill.address.slice(0, 10)}…{selectedSkill.address.slice(-6)}
                   </p>
                 </div>
               </div>
               <Link
                 href={`/token/${selectedSkill.address}`}
-                className="mt-3 flex items-center gap-1.5 rounded-full border border-bnb-yellow/25 bg-bnb-yellow/10 px-3 py-1.5 text-[11px] font-semibold text-bnb-yellow hover:bg-bnb-yellow/20 hover:shadow-[0_0_12px_rgba(243,186,47,0.2)] transition-all w-fit"
+                className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition-all w-fit"
+                style={{ border: "1px solid #F5C220", color: "#F5C220", background: "rgba(245,194,32,0.06)" }}
               >
                 View Skill Token <ExternalLink size={9} />
               </Link>
             </div>
           ) : (
-            <div className="flex items-center gap-5 px-5 py-3 text-[11px] text-gray-600">
+            <div className="flex items-center gap-5 px-5 py-3 text-[11px] font-bold uppercase tracking-wider" style={{ color: "#555555" }}>
               <span className="flex items-center gap-1.5">
-                <span className="inline-block h-px w-5 bg-green-500" /> Accessible
+                <span className="inline-block h-px w-5" style={{ background: "#4ade80" }} /> Accessible
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="inline-block h-px w-5 border-t border-dashed border-purple-600" /> Locked
+                <span className="inline-block h-px w-5 border-t border-dashed" style={{ borderColor: "#6d28d9" }} /> Locked
               </span>
-              <span className="ml-auto text-gray-700 italic">Click a node to inspect</span>
+              <span className="ml-auto italic" style={{ color: "#444444" }}>Click a node to inspect</span>
             </div>
           )}
         </>

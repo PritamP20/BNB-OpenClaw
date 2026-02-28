@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, SlidersHorizontal, Flame, Clock, TrendingUp, Bot, Coins, Puzzle, Rocket, X } from "lucide-react";
+import { Search, Flame, Clock, TrendingUp, Bot, Coins, Puzzle, Rocket, X } from "lucide-react";
 import { TokenCard } from "./TokenCard";
 import { useTokens, type Token } from "../hooks/useTokens";
 import { Loader2 } from "lucide-react";
@@ -9,11 +9,11 @@ import { Loader2 } from "lucide-react";
 type Filter  = "all" | Token["type"];
 type SortKey = "trending" | "new" | "marketcap";
 
-const FILTERS: { value: Filter; label: string; icon: React.ElementType; color: string }[] = [
-  { value: "all",    label: "All",       icon: Rocket, color: "text-bnb-yellow" },
-  { value: "agent",  label: "AI Agents", icon: Bot,    color: "text-purple-400"  },
-  { value: "normal", label: "Tokens",    icon: Coins,  color: "text-blue-400"    },
-  { value: "skill",  label: "Skills",    icon: Puzzle, color: "text-green-400"   },
+const FILTERS: { value: Filter; label: string; icon: React.ElementType; accentColor: string }[] = [
+  { value: "all",    label: "All",       icon: Rocket, accentColor: "#F5C220" },
+  { value: "agent",  label: "AI Agents", icon: Bot,    accentColor: "#1B4EF8" },
+  { value: "normal", label: "Tokens",    icon: Coins,  accentColor: "#F5C220" },
+  { value: "skill",  label: "Skills",    icon: Puzzle, accentColor: "#D62828" },
 ];
 
 const SORTS: { value: SortKey; label: string; icon: React.ElementType }[] = [
@@ -49,44 +49,42 @@ export function TrendingFeed() {
     <section className="relative mx-auto max-w-7xl px-4 py-10">
       {/* Section header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-extrabold tracking-tight text-white">
-            Live <span className="shimmer-text">Token Feed</span>
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            {tokens.length} token{tokens.length !== 1 ? "s" : ""} on BNB Chain
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-1" style={{ background: "#F5C220" }} />
+          <div>
+            <h2 className="text-2xl font-black uppercase tracking-tight" style={{ color: "#F5F5F5" }}>
+              Live Token Feed
+            </h2>
+            <p className="text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: "#555555" }}>
+              {tokens.length} token{tokens.length !== 1 ? "s" : ""} on BNB Chain
+            </p>
+          </div>
         </div>
 
         {/* Search */}
         <div className="relative flex-shrink-0">
-          <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#555555" }} />
           <input
             type="text"
             placeholder="Search tokens…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-10 w-56 rounded-xl pl-9 pr-9 text-sm text-white placeholder-gray-600 outline-none transition-all"
+            className="h-10 w-56 pl-9 pr-9 text-sm outline-none"
             style={{
-              background: "rgba(18,18,26,0.9)",
-              border: "1px solid rgba(243,186,47,0.15)",
-              backdropFilter: "blur(12px)",
+              background: "#1A1A1A",
+              border: "1px solid #333333",
+              color: "#F5F5F5",
             }}
-            onFocus={(e) => {
-              e.currentTarget.style.border = "1px solid rgba(243,186,47,0.45)";
-              e.currentTarget.style.boxShadow = "0 0 12px rgba(243,186,47,0.1)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.border = "1px solid rgba(243,186,47,0.15)";
-              e.currentTarget.style.boxShadow = "none";
-            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "#F5C220"; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = "#333333"; }}
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+              style={{ color: "#555555" }}
             >
-              <X size={13} />
+              <X size={12} />
             </button>
           )}
         </div>
@@ -94,26 +92,22 @@ export function TrendingFeed() {
 
       {/* Controls row */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* Type filters */}
-        <div
-          className="flex gap-1 p-1 rounded-2xl"
-          style={{ background: "rgba(18,18,26,0.9)", border: "1px solid rgba(243,186,47,0.1)" }}
-        >
-          {FILTERS.map(({ value, label, icon: Icon, color }) => {
+        {/* Type filters — flat rectangular buttons */}
+        <div className="flex" style={{ border: "1px solid #333333" }}>
+          {FILTERS.map(({ value, label, icon: Icon, accentColor }) => {
             const active = filter === value;
             return (
               <button
                 key={value}
                 onClick={() => setFilter(value)}
-                className="relative flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition-all"
+                className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-black uppercase tracking-wider transition-all"
                 style={{
-                  background: active ? "rgba(243,186,47,0.12)" : "transparent",
-                  color: active ? "#F3BA2F" : "#9ca3af",
-                  border: active ? "1px solid rgba(243,186,47,0.3)" : "1px solid transparent",
-                  boxShadow: active ? "0 0 12px rgba(243,186,47,0.15)" : "none",
+                  background: active ? accentColor : "#1A1A1A",
+                  color: active ? "#0F0F0F" : "#888888",
+                  borderRight: "1px solid #333333",
                 }}
               >
-                <Icon size={13} className={active ? "text-bnb-yellow" : color} />
+                <Icon size={12} />
                 {label}
               </button>
             );
@@ -121,23 +115,22 @@ export function TrendingFeed() {
         </div>
 
         {/* Sort tabs */}
-        <div
-          className="flex gap-1 p-1 rounded-2xl"
-          style={{ background: "rgba(18,18,26,0.9)", border: "1px solid rgba(255,255,255,0.06)" }}
-        >
+        <div className="flex" style={{ border: "1px solid #333333" }}>
           {SORTS.map(({ value, label, icon: Icon }) => {
             const active = sort === value;
             return (
               <button
                 key={value}
                 onClick={() => setSort(value)}
-                className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all"
+                className="flex items-center gap-1.5 px-3 py-2.5 text-xs font-black uppercase tracking-wider transition-all"
                 style={{
-                  background: active ? "rgba(255,255,255,0.08)" : "transparent",
-                  color: active ? "#ffffff" : "#6b7280",
+                  background: active ? "#222222" : "#1A1A1A",
+                  color: active ? "#F5F5F5" : "#555555",
+                  borderRight: "1px solid #333333",
+                  borderBottom: active ? "2px solid #F5C220" : "2px solid transparent",
                 }}
               >
-                <Icon size={12} />
+                <Icon size={11} />
                 {label}
               </button>
             );
@@ -147,20 +140,24 @@ export function TrendingFeed() {
 
       {/* Token grid */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-24 gap-3 text-gray-500">
-          <Loader2 size={20} className="animate-spin text-bnb-yellow" />
-          <span className="text-sm">Loading tokens from chain…</span>
+        <div className="flex items-center justify-center py-24 gap-3" style={{ color: "#555555" }}>
+          <Loader2 size={18} className="animate-spin" style={{ color: "#F5C220" }} />
+          <span className="text-sm font-bold uppercase tracking-wider">Loading tokens from chain…</span>
         </div>
       ) : error ? (
-        <div className="py-20 text-center text-red-400 text-sm">
+        <div className="py-20 text-center text-sm font-bold uppercase tracking-wider" style={{ color: "#D62828" }}>
           Failed to load tokens. Check your connection.
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-20 text-center">
-          <div className="text-4xl mb-3">🔍</div>
-          <p className="text-gray-500 text-sm">No tokens found matching your search.</p>
+        <div className="py-20 text-center" style={{ border: "1px solid #222222", background: "#1A1A1A" }}>
+          <div className="text-4xl mb-4">—</div>
+          <p className="text-sm font-bold uppercase tracking-wider" style={{ color: "#555555" }}>No tokens found matching your search.</p>
           {search && (
-            <button onClick={() => setSearch("")} className="mt-2 text-sm text-bnb-yellow/70 hover:text-bnb-yellow transition-colors">
+            <button
+              onClick={() => setSearch("")}
+              className="mt-4 text-xs font-black uppercase tracking-wider transition-colors"
+              style={{ color: "#F5C220", borderBottom: "1px solid #F5C220", paddingBottom: "1px" }}
+            >
               Clear search
             </button>
           )}
@@ -172,7 +169,7 @@ export function TrendingFeed() {
               <TokenCard key={token.address} token={token} />
             ))}
           </div>
-          <p className="mt-6 text-center text-xs text-gray-600">
+          <p className="mt-6 text-center text-xs font-bold uppercase tracking-wider" style={{ color: "#444444" }}>
             Showing {filtered.length} of {tokens.length} tokens
           </p>
         </>
