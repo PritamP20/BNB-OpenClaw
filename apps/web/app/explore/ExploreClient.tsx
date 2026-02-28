@@ -48,19 +48,19 @@ function ExploreHero({ total, agents, tokens, skills }: {
     total: number; agents: number; tokens: number; skills: number;
 }) {
     return (
-        <div className="relative overflow-hidden border-b border-bnb-border pb-8 pt-10">
+        <div className="relative overflow-hidden pb-8 pt-10" style={{ borderBottom: "1px solid rgba(243,186,47,0.1)" }}>
             {/* Glow */}
-            <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-40 w-[600px] rounded-full bg-bnb-yellow/5 blur-3xl" />
+            <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-48 w-[700px] rounded-full blur-3xl" style={{ background: "radial-gradient(ellipse, rgba(243,186,47,0.1) 0%, transparent 70%)" }} />
 
             <div className="relative mx-auto max-w-7xl px-4">
                 <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
                     <div>
-                        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-bnb-yellow/30 bg-bnb-yellow/10 px-3 py-1 text-xs text-bnb-yellow">
+                        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-bnb-yellow/30 bg-bnb-yellow/8 px-3 py-1 text-xs text-bnb-yellow" style={{ background: "rgba(243,186,47,0.06)" }}>
                             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-bnb-yellow" />
                             Live · BNB Chain Testnet
                         </div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
-                            Explore <span className="text-bnb-yellow">Tokens</span>
+                            Explore <span className="shimmer-text">Tokens</span>
                         </h1>
                         <p className="mt-1 text-sm text-gray-500">
                             Browse all AI agents, tokens, and skill modules launching on BNB Chain.
@@ -68,7 +68,7 @@ function ExploreHero({ total, agents, tokens, skills }: {
                     </div>
                     <Link
                         href="/launch"
-                        className="flex items-center gap-2 rounded-xl bg-bnb-yellow px-5 py-2.5 text-sm font-bold text-black transition-opacity hover:opacity-90"
+                        className="btn-neon flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm"
                     >
                         <Rocket size={14} /> Launch Token
                     </Link>
@@ -77,16 +77,21 @@ function ExploreHero({ total, agents, tokens, skills }: {
                 {/* Stat cards */}
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {[
-                        { label: "Total Listed", value: total, icon: Star, accent: "text-bnb-yellow" },
-                        { label: "AI Agents", value: agents, icon: Bot, accent: "text-purple-400" },
-                        { label: "Tokens", value: tokens, icon: Coins, accent: "text-blue-400" },
-                        { label: "Skill Modules", value: skills, icon: Puzzle, accent: "text-green-400" },
-                    ].map(({ label, value, icon: Icon, accent }) => (
-                        <div key={label} className="flex items-center gap-3 rounded-2xl border border-bnb-border bg-bnb-card px-4 py-3">
-                            <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 ${accent}`}>
+                        { label: "Total Listed",  value: total,  icon: Star,   accent: "text-bnb-yellow",  glow: "rgba(243,186,47,0.2)",   bg: "rgba(243,186,47,0.07)",   border: "rgba(243,186,47,0.2)"   },
+                        { label: "AI Agents",     value: agents, icon: Bot,    accent: "text-purple-400", glow: "rgba(192,132,252,0.2)", bg: "rgba(192,132,252,0.07)", border: "rgba(192,132,252,0.2)" },
+                        { label: "Tokens",        value: tokens, icon: Coins,  accent: "text-blue-400",   glow: "rgba(96,165,250,0.2)",  bg: "rgba(96,165,250,0.07)",  border: "rgba(96,165,250,0.2)"  },
+                        { label: "Skill Modules", value: skills, icon: Puzzle, accent: "text-green-400",  glow: "rgba(74,222,128,0.2)",  bg: "rgba(74,222,128,0.07)",  border: "rgba(74,222,128,0.2)"  },
+                    ].map(({ label, value, icon: Icon, accent, glow, bg, border }) => (
+                        <div
+                            key={label}
+                            className="group relative flex items-center gap-3 rounded-2xl px-4 py-3 transition-all hover:scale-[1.02]"
+                            style={{ background: bg, border: `1px solid ${border}`, backdropFilter: "blur(12px)" }}
+                        >
+                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" style={{ boxShadow: `0 0 16px ${glow}` }} />
+                            <div className={`relative z-10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${accent}`} style={{ background: bg }}>
                                 <Icon size={17} />
                             </div>
-                            <div>
+                            <div className="relative z-10">
                                 <p className="text-[11px] text-gray-500">{label}</p>
                                 <p className="text-lg font-extrabold text-white">{value.toLocaleString()}</p>
                             </div>
@@ -111,7 +116,8 @@ function SortDropdown({ sort, dir, onChange }: {
         <div ref={ref} className="relative">
             <button
                 onClick={() => setOpen((o) => !o)}
-                className="flex items-center gap-2 rounded-xl border border-bnb-border bg-bnb-card px-3 py-2.5 text-sm text-gray-300 transition-colors hover:border-white/20 hover:text-white"
+            className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm text-gray-300 transition-all hover:border-bnb-yellow/30 hover:text-white hover:shadow-glow-sm`}
+            style={{ background: "rgba(18,18,26,0.9)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" }}
             >
                 <ArrowUpDown size={13} className="text-gray-500" />
                 {label}
@@ -119,7 +125,7 @@ function SortDropdown({ sort, dir, onChange }: {
                 <ChevronDown size={13} className={`text-gray-500 transition-transform ${open ? "rotate-180" : ""}`} />
             </button>
             {open && (
-                <div className="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-bnb-border bg-bnb-card shadow-xl shadow-black/40">
+                    <div className="absolute right-0 top-full z-20 mt-1 w-44 rounded-2xl shadow-xl shadow-black/60 backdrop-blur-xl" style={{ background: "rgba(14,14,20,0.96)", border: "1px solid rgba(243,186,47,0.15)" }}>
                     {SORT_OPTIONS.map((o) => (
                         <button
                             key={o.key}
@@ -162,7 +168,9 @@ function TokenRow({ token, rank }: { token: Token; rank: number }) {
 
     return (
         <Link href={`/token/${token.address}`}>
-            <div className="group grid grid-cols-[32px_1fr_100px_100px_90px_90px_80px] items-center gap-4 border-b border-bnb-border px-4 py-3 transition-colors hover:bg-white/[0.03]">
+            <div
+            className={`group grid grid-cols-[32px_1fr_100px_100px_90px_90px_80px] items-center gap-4 px-4 py-3 transition-colors hover:bg-bnb-yellow/[0.03]`}
+            style={{ borderBottom: "1px solid rgba(243,186,47,0.06)" }}>
                 {/* Rank */}
                 <span className="text-center text-xs font-semibold text-gray-600">{rank}</span>
 
@@ -261,7 +269,7 @@ export function ExploreClient() {
     };
 
     return (
-        <div className="min-h-screen bg-bnb-dark">
+        <div className="min-h-screen">
             <ExploreHero {...counts} />
 
             <div className="mx-auto max-w-7xl px-4 py-8">
@@ -275,10 +283,11 @@ export function ExploreClient() {
                             <button
                                 key={key}
                                 onClick={() => setTypeFilter(key)}
-                                className={`flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium transition-all ${typeFilter === key
+                                className={`flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-semibold transition-all ${typeFilter === key
                                     ? color
-                                    : "border-bnb-border text-gray-500 hover:border-white/20 hover:text-gray-300"
+                                    : "border-white/10 text-gray-500 hover:border-white/20 hover:text-gray-300"
                                     }`}
+                                style={typeFilter === key ? { boxShadow: "0 0 12px rgba(243,186,47,0.15)" } : {}}
                             >
                                 <Icon size={13} />{label}
                                 <span className="ml-0.5 text-[11px] opacity-60">
@@ -298,7 +307,8 @@ export function ExploreClient() {
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder="Search by name, symbol, or description…"
-                                className="w-full rounded-xl border border-bnb-border bg-bnb-card py-2.5 pl-9 pr-4 text-sm text-white placeholder-gray-600 outline-none transition-colors focus:border-bnb-yellow/40"
+                                className="w-full rounded-xl py-2.5 pl-9 pr-4 text-sm text-white placeholder-gray-600 outline-none transition-all focus:shadow-glow-sm"
+                                style={{ background: "rgba(18,18,26,0.9)", border: "1px solid rgba(243,186,47,0.15)", backdropFilter: "blur(12px)" }}
                             />
                             {query && (
                                 <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400">
@@ -312,7 +322,7 @@ export function ExploreClient() {
                             onClick={() => setGraduated(graduated === true ? null : true)}
                             className={`flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm transition-all ${graduated === true
                                 ? "border-green-400/40 bg-green-400/10 text-green-400"
-                                : "border-bnb-border text-gray-500 hover:border-white/20 hover:text-gray-300"
+                                : "border-bnb-yellow/10 text-gray-500 hover:border-white/20 hover:text-gray-300"
                                 }`}
                         >
                             <Trophy size={13} /> Graduated
@@ -322,14 +332,19 @@ export function ExploreClient() {
                         <SortDropdown sort={sort} dir={sortDir} onChange={(k, d) => { setSort(k); setSortDir(d); }} />
 
                         {/* View toggle */}
-                        <div className="flex rounded-xl border border-bnb-border bg-bnb-card overflow-hidden">
+                        <div
+                            className="flex overflow-hidden rounded-xl"
+                            style={{ background: "rgba(18,18,26,0.9)", border: "1px solid rgba(255,255,255,0.1)" }}
+                        >
                             {(["grid", "list"] as ViewMode[]).map((m) => (
                                 <button
                                     key={m}
                                     onClick={() => setViewMode(m)}
-                                    className={`px-3 py-2.5 text-xs font-medium transition-colors ${viewMode === m ? "bg-white/10 text-white" : "text-gray-600 hover:text-gray-400"
-                                        }`}
-                                >
+                                    className={`px-3 py-2.5 text-xs font-semibold transition-all ${viewMode === m
+                                    ? "text-bnb-yellow"
+                                    : "text-gray-600 hover:text-gray-400"
+                                }`}
+                                style={viewMode === m ? { background: "rgba(243,186,47,0.1)" } : {}}>
                                     {m === "grid" ? "⊞ Grid" : "☰ List"}
                                 </button>
                             ))}
@@ -347,7 +362,7 @@ export function ExploreClient() {
                                 onClick={() => setActiveTag(activeTag === i ? null : i)}
                                 className={`rounded-full border px-3 py-1 text-xs transition-all ${activeTag === i
                                     ? "border-bnb-yellow/40 bg-bnb-yellow/10 text-bnb-yellow"
-                                    : "border-bnb-border text-gray-500 hover:border-white/20 hover:text-gray-300"
+                                    : "border-bnb-yellow/10 text-gray-500 hover:border-white/20 hover:text-gray-300"
                                     }`}
                             >
                                 {label}
@@ -384,11 +399,11 @@ export function ExploreClient() {
 
                 {/* ── Token grid / list ──────────────────────────────────────────────── */}
                 {filtered.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center rounded-2xl border border-bnb-border bg-bnb-card py-20 text-center">
+                    <div className="flex flex-col items-center justify-center rounded-2xl py-20 text-center backdrop-blur-xl" style={{ background: "rgba(12,12,18,0.85)", border: "1px solid rgba(243,186,47,0.1)" }}>
                         <div className="mb-4 text-5xl">🔍</div>
                         <p className="text-lg font-semibold text-white">No tokens found</p>
                         <p className="mt-1 text-sm text-gray-500">Try adjusting your filters or search query.</p>
-                        <button onClick={clearFilters} className="mt-5 rounded-xl border border-bnb-border px-5 py-2 text-sm text-gray-400 hover:border-white/30 hover:text-white transition-colors">
+                        <button onClick={clearFilters} className="btn-outline-neon mt-5 rounded-xl px-5 py-2 text-sm transition-colors">
                             Clear filters
                         </button>
                     </div>
@@ -399,9 +414,9 @@ export function ExploreClient() {
                         ))}
                     </div>
                 ) : (
-                    <div className="overflow-hidden rounded-2xl border border-bnb-border bg-bnb-card">
+                    <div className="overflow-hidden rounded-2xl backdrop-blur-xl" style={{ background: "rgba(12,12,18,0.9)", border: "1px solid rgba(243,186,47,0.1)" }}>
                         {/* List header */}
-                        <div className="grid grid-cols-[32px_1fr_100px_100px_90px_90px_80px] items-center gap-4 border-b border-bnb-border bg-white/[0.02] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-widest text-gray-600">
+                        <div className="grid grid-cols-[32px_1fr_100px_100px_90px_90px_80px] items-center gap-4 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-600" style={{ background: "rgba(243,186,47,0.04)", borderBottom: "1px solid rgba(243,186,47,0.1)" }}>
                             <span className="text-center">#</span>
                             <span>Token</span>
                             <span className="text-right">Mkt Cap</span>

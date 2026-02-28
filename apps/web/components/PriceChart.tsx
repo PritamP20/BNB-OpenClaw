@@ -34,7 +34,7 @@ function PriceTooltip({ active, payload }: { active?: boolean; payload?: Array<{
   const d = payload[0]?.payload;
   if (!d) return null;
   return (
-    <div className="rounded-xl border border-bnb-border bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
+    <div className="rounded-xl border border-bnb-yellow/10 bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
       <p className="mb-1.5 text-gray-500">
         {new Date(d.time).toLocaleString([], {
           month: "short", day: "numeric",
@@ -63,7 +63,7 @@ function VolumeTooltip({ active, payload }: { active?: boolean; payload?: Array<
   if (!d) return null;
   const total = d.buyVol + d.sellVol;
   return (
-    <div className="rounded-xl border border-bnb-border bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
+    <div className="rounded-xl border border-bnb-yellow/10 bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
       <p className="font-mono font-bold text-white">
         {fmtUSD(total, true)} vol
       </p>
@@ -116,7 +116,7 @@ export function PriceChart({ token }: { token: MockToken }) {
   // ── Empty state (token on-chain, curve found, but no trades yet) ───────────
   if (tokenAddress && fetched && curveFound && data.length === 0) {
     return (
-      <div className="flex h-80 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-bnb-border text-center">
+      <div className="flex h-80 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-bnb-yellow/10 text-center">
         <TrendingUp className="h-8 w-8 text-bnb-yellow/50" />
         <p className="text-sm font-medium text-gray-400">No trades yet</p>
         <p className="max-w-xs text-xs text-gray-600">
@@ -153,7 +153,7 @@ export function PriceChart({ token }: { token: MockToken }) {
           </span>
         </div>
         {/* Range tabs */}
-        <div className="ml-auto flex gap-0.5 rounded-lg border border-bnb-border bg-black/40 p-0.5">
+        <div className="ml-auto flex gap-0.5 rounded-lg border border-bnb-yellow/10 bg-black/40 p-0.5">
           {RANGES.map((r) => (
             <button
               key={r}

@@ -139,13 +139,16 @@ function InfoRow({ label, children }: { label: string; children: React.ReactNode
 }
 
 function StatPill({
-  label, value, accent, sub,
+  label, value, accent, sub, icon,
 }: {
-  label: string; value: string; accent?: string; sub?: string;
+  label: string; value: string; accent?: string; sub?: string; icon?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center rounded-xl border border-bnb-border bg-bnb-card px-4 py-3 text-center">
-      <span className="text-[10px] font-medium uppercase tracking-widest text-gray-600">{label}</span>
+    <div className="group flex flex-col items-center rounded-xl border border-bnb-yellow/10 glass px-4 py-3 text-center transition-all duration-200 hover:border-bnb-yellow/25 hover:shadow-[0_0_16px_rgba(243,186,47,0.1)]">
+      <div className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-widest text-gray-600 group-hover:text-gray-500 transition-colors">
+        {icon && <span className="opacity-60">{icon}</span>}
+        {label}
+      </div>
       <span className={`mt-1 font-mono text-base font-bold ${accent ?? "text-white"}`}>{value}</span>
       {sub && <span className="mt-0.5 text-[10px] text-gray-600">{sub}</span>}
     </div>
@@ -177,7 +180,7 @@ function BondingCurveBar({
         : "from-blue-500 to-bnb-yellow";
 
   return (
-    <div className="rounded-2xl border border-bnb-border bg-bnb-card p-5">
+    <div className="rounded-2xl border border-bnb-yellow/10 glass p-5">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white">Bonding Curve</h3>
         <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
@@ -191,7 +194,14 @@ function BondingCurveBar({
       <div className="relative h-4 w-full overflow-hidden rounded-full bg-white/[0.07]">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-700`}
-          style={{ width: `${Math.min(progress, 100)}%` }}
+          style={{
+            width: `${Math.min(progress, 100)}%`,
+            boxShadow: progress >= 75
+              ? "0 0 14px rgba(74,222,128,0.5), 0 0 28px rgba(74,222,128,0.2)"
+              : progress >= 50
+              ? "0 0 14px rgba(243,186,47,0.5), 0 0 28px rgba(243,186,47,0.2)"
+              : "0 0 14px rgba(59,130,246,0.4)",
+          }}
         />
         {MILESTONES.slice(0, -1).map(({ pct }) => (
           <div key={pct} className="absolute top-0 h-full w-px bg-white/10" style={{ left: `${pct}%` }} />
@@ -203,15 +213,15 @@ function BondingCurveBar({
         ))}
       </div>
       <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
-        <div className="rounded-lg bg-white/[0.03] p-2.5 text-center">
+        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
           <p className="text-gray-600">BNB Raised</p>
-          <p className="font-mono font-bold text-white mt-0.5">{bnbRaised} BNB</p>
+          <p className="font-mono font-bold text-bnb-yellow mt-0.5">{bnbRaised} BNB</p>
         </div>
-        <div className="rounded-lg bg-white/[0.03] p-2.5 text-center">
+        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
           <p className="text-gray-600">Target</p>
           <p className="font-mono font-bold text-white mt-0.5">69 BNB</p>
         </div>
-        <div className="rounded-lg bg-white/[0.03] p-2.5 text-center">
+        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
           <p className="text-gray-600">Remaining</p>
           <p className="font-mono font-bold text-bnb-yellow mt-0.5">
             {(69 - parseFloat(bnbRaised)).toFixed(2)} BNB
@@ -229,12 +239,14 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
   const { trades, loading, fetched, curveFound } = useTrades(token.address);
 
   return (
-    <div className="rounded-2xl border border-bnb-border bg-bnb-card">
-      <div className="flex items-center gap-0.5 border-b border-bnb-border p-2">
+    <div className="rounded-2xl border border-bnb-yellow/10 glass">
+      <div className="flex items-center gap-0.5 border-b border-bnb-yellow/10 p-2">
         {(["trades", "info"] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)}
-            className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${
-              tab === t ? "bg-white/[0.07] text-white" : "text-gray-500 hover:text-white"
+            className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 ${
+              tab === t
+                ? "bg-bnb-yellow/10 text-bnb-yellow border border-bnb-yellow/25"
+                : "text-gray-500 border border-transparent hover:text-bnb-yellow/70"
             }`}
           >
             {t === "trades" ? <><Activity size={12} /> Trades</> : <><Info size={12} /> Token Info</>}
@@ -278,9 +290,11 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
 
           {/* Real trades */}
           {trades.map((t, i) => (
-            <div key={i} className="grid grid-cols-5 items-center px-4 py-2.5 text-xs hover:bg-white/[0.02] transition-colors">
+            <div key={i} className="grid grid-cols-5 items-center px-4 py-2.5 text-xs hover:bg-bnb-yellow/[0.025] transition-colors">
               <span className={`w-fit rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-                t.type === "buy" ? "bg-green-400/10 text-green-400" : "bg-red-400/10 text-red-400"
+                t.type === "buy"
+                  ? "bg-green-400/10 text-green-400 shadow-[0_0_8px_rgba(74,222,128,0.2)]"
+                  : "bg-red-400/10 text-red-400 shadow-[0_0_8px_rgba(248,113,113,0.2)]"
               }`}>{t.type}</span>
               <a
                 href={`https://testnet.bscscan.com/address/${t.walletFull}`}
@@ -336,7 +350,7 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
           </InfoRow>
           <InfoRow label="Network">
             <span className="flex items-center gap-1 text-gray-300">
-              <span className="h-2 w-2 rounded-full bg-bnb-yellow" /> BNB Chain Testnet
+              <span className="h-2 w-2 rounded-full bg-bnb-yellow animate-pulse" /> BNB Chain Testnet
             </span>
           </InfoRow>
           <InfoRow label="Created">
@@ -452,7 +466,7 @@ function SkillBranchGraph({
   if (!registryAddr) return null;
 
   return (
-    <div className="rounded-2xl border border-bnb-border bg-bnb-card p-5">
+    <div className="rounded-2xl border border-bnb-yellow/10 glass p-5">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
@@ -469,7 +483,7 @@ function SkillBranchGraph({
           </p>
         </div>
         {userAddress && n > 0 && (
-          <div className="flex items-center gap-1.5 rounded-full border border-bnb-border bg-bnb-dark px-3 py-1 text-xs">
+          <div className="flex items-center gap-1.5 rounded-full border border-bnb-yellow/10 bg-bnb-dark px-3 py-1 text-xs">
             <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
             <span className="text-green-400 font-mono">{skills.filter((s) => s.hasAccess).length}</span>
             <span className="text-gray-600">/ {n} accessible</span>
@@ -710,7 +724,7 @@ function SkillBranchGraph({
             </svg>
 
             {/* Skill count badge overlay */}
-            <div className="absolute top-3 right-3 rounded-full border border-bnb-border bg-bnb-card/80 px-2.5 py-1 text-[11px] font-mono text-gray-500 backdrop-blur">
+            <div className="absolute top-3 right-3 rounded-full border border-bnb-yellow/10 glass/80 px-2.5 py-1 text-[11px] font-mono text-gray-500 backdrop-blur">
               {n} skill{n !== 1 ? "s" : ""}
             </div>
           </div>
@@ -720,7 +734,7 @@ function SkillBranchGraph({
             <div className="mt-3 rounded-xl border border-bnb-yellow/20 bg-bnb-yellow/5 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bnb-card text-xl border border-bnb-border">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl glass text-xl border border-bnb-yellow/10">
                     {getSkillIcon(selectedSkill.symbol)}
                   </div>
                   <div>
@@ -744,7 +758,7 @@ function SkillBranchGraph({
               </div>
 
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded-lg bg-bnb-card p-2.5">
+                <div className="rounded-lg glass p-2.5">
                   <p className="text-gray-600">Cost Per Use</p>
                   <p className="mt-0.5 font-mono font-bold text-white">
                     {selectedSkill.costPerUse === 0n
@@ -752,7 +766,7 @@ function SkillBranchGraph({
                       : `${formatEther(selectedSkill.costPerUse)} ${selectedSkill.symbol}`}
                   </p>
                 </div>
-                <div className="rounded-lg bg-bnb-card p-2.5">
+                <div className="rounded-lg glass p-2.5">
                   <p className="text-gray-600">Contract</p>
                   <p className="mt-0.5 font-mono text-gray-400 truncate">
                     {selectedSkill.address.slice(0, 10)}…{selectedSkill.address.slice(-6)}
@@ -788,7 +802,7 @@ function SkillBranchGraph({
                   className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-all ${
                     selected === i
                       ? "border-bnb-yellow/40 bg-bnb-yellow/5"
-                      : "border-bnb-border bg-bnb-dark hover:border-bnb-border/80 hover:bg-white/[0.03]"
+                      : "border-bnb-yellow/10 bg-bnb-dark hover:border-bnb-yellow/10/80 hover:bg-white/[0.03]"
                   }`}
                 >
                   <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border text-lg ${
@@ -949,12 +963,12 @@ export function AgentPageClient({ token }: { token: Token }) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       {/* Back */}
-      <Link href="/" className="mb-5 inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-white transition-colors">
-        <ArrowLeft size={14} /> Back to Explore
+      <Link href="/" className="mb-5 inline-flex items-center gap-1.5 text-sm text-bnb-yellow/50 hover:text-bnb-yellow transition-colors group">
+        <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" /> Back to Explore
       </Link>
 
       {/* ── Agent Hero ──────────────────────────────────────────────────────── */}
-      <div className="mb-6 overflow-hidden rounded-2xl border border-bnb-border bg-bnb-card">
+      <div className="mb-6 overflow-hidden rounded-2xl border border-bnb-yellow/10 glass">
         {/* Yellow accent bar */}
         <div className="h-0.5 w-full bg-gradient-to-r from-bnb-yellow/80 via-purple-500/60 to-transparent" />
 
@@ -973,7 +987,7 @@ export function AgentPageClient({ token }: { token: Token }) {
             {/* Name + badges */}
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-extrabold tracking-tight text-white">{chainName}</h1>
+                <h1 className="text-3xl font-extrabold tracking-tight shimmer-text">{chainName}</h1>
                 <span className="flex items-center gap-1 rounded-full border border-purple-400/25 bg-purple-400/10 px-2.5 py-0.5 text-xs font-semibold text-purple-400">
                   <Bot size={10} /> AI Agent
                 </span>
@@ -997,30 +1011,36 @@ export function AgentPageClient({ token }: { token: Token }) {
 
               {/* Description */}
               {token.description ? (
-                <p className="mt-3 text-sm leading-relaxed text-gray-500 max-w-2xl">{token.description}</p>
+                <div className="mt-3 flex gap-3">
+                  <div className="w-0.5 flex-shrink-0 rounded-full bg-bnb-yellow/20 self-stretch" />
+                  <p className="text-sm leading-relaxed text-gray-500 max-w-2xl">{token.description}</p>
+                </div>
               ) : (
-                <p className="mt-3 text-sm leading-relaxed text-gray-700 max-w-2xl italic">
-                  An AI Agent on BNB Chain. This agent can be extended with skill modules and used by token holders for automated tasks, research, trading signals, or custom AI workflows.
-                </p>
+                <div className="mt-3 flex gap-3">
+                  <div className="w-0.5 flex-shrink-0 rounded-full bg-bnb-yellow/20 self-stretch" />
+                  <p className="text-sm leading-relaxed text-gray-700 max-w-2xl italic">
+                    An AI Agent on BNB Chain. This agent can be extended with skill modules and used by token holders for automated tasks, research, trading signals, or custom AI workflows.
+                  </p>
+                </div>
               )}
 
               {/* Agent metadata chips */}
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {chainAgentId != null && (
-                  <span className="flex items-center gap-1 rounded-full border border-bnb-border bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
+                  <span className="flex items-center gap-1 rounded-full border border-bnb-yellow/10 bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
                     <Cpu size={10} className="text-bnb-yellow" />
                     Agent #{chainAgentId.toString()}
                   </span>
                 )}
-                <span className="flex items-center gap-1 rounded-full border border-bnb-border bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
+                <span className="flex items-center gap-1 rounded-full border border-bnb-yellow/10 bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
                   <Globe size={10} className="text-blue-400" />
                   BNB Chain Testnet
                 </span>
-                <span className="flex items-center gap-1 rounded-full border border-bnb-border bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
+                <span className="flex items-center gap-1 rounded-full border border-bnb-yellow/10 bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
                   <Clock size={10} className="text-gray-500" />
                   {timeAgo(finalCreatedAt)}
                 </span>
-                <span className="flex items-center gap-1 rounded-full border border-bnb-border bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
+                <span className="flex items-center gap-1 rounded-full border border-bnb-yellow/10 bg-white/[0.03] px-2.5 py-1 text-xs text-gray-500">
                   <Users size={10} className="text-gray-500" />
                   {liveToken.holders.toLocaleString()} holders
                 </span>
@@ -1050,12 +1070,13 @@ export function AgentPageClient({ token }: { token: Token }) {
 
       {/* ── Stats strip ──────────────────────────────────────────────────────── */}
       <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatPill label="Market Cap" value={fmtUSD(finalMarketCap, true)} />
-        <StatPill label="24h Volume" value={fmtUSD(token.volume24h, true)} />
-        <StatPill label="Holders" value={liveToken.holders.toLocaleString()} />
+        <StatPill label="Market Cap" value={fmtUSD(finalMarketCap, true)} icon={<TrendingUp size={9} />} />
+        <StatPill label="24h Volume" value={fmtUSD(token.volume24h, true)} icon={<Activity size={9} />} accent="text-green-400" />
+        <StatPill label="Holders" value={liveToken.holders.toLocaleString()} icon={<Users size={9} />} />
         <StatPill
           label="Rep Score"
           value={`${liveToken.reputationScore}/100`}
+          icon={<Star size={9} />}
           accent={
             liveToken.reputationScore >= 75 ? "text-green-400"
               : liveToken.reputationScore >= 50 ? "text-bnb-yellow"
@@ -1076,7 +1097,13 @@ export function AgentPageClient({ token }: { token: Token }) {
         <div className="flex flex-col gap-5">
 
           {/* Price chart */}
-          <div className="rounded-2xl border border-bnb-border bg-bnb-card p-5">
+          <div className="rounded-2xl border border-bnb-yellow/10 glass p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-bnb-yellow/10 border border-bnb-yellow/20">
+                <Activity size={12} className="text-bnb-yellow" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">Price Chart</h3>
+            </div>
             <PriceChart token={liveToken as never} />
           </div>
 
@@ -1106,9 +1133,12 @@ export function AgentPageClient({ token }: { token: Token }) {
           <BuySellPanel token={liveToken} curveAddress={token.curveAddress} />
 
           {/* Agent info card */}
-          <div className="rounded-2xl border border-bnb-border bg-bnb-card p-4 flex flex-col gap-2.5 text-xs">
+          <div className="rounded-2xl border border-bnb-yellow/10 glass p-4 flex flex-col gap-2.5 text-xs">
             <h4 className="flex items-center gap-1.5 text-sm font-semibold text-white">
-              <Shield size={13} className="text-bnb-yellow" /> Agent Details
+              <span className="flex h-5 w-5 items-center justify-center rounded bg-bnb-yellow/10">
+                <Shield size={11} className="text-bnb-yellow" />
+              </span>
+              Agent Details
             </h4>
 
             <InfoRow label="Contract">
@@ -1139,7 +1169,7 @@ export function AgentPageClient({ token }: { token: Token }) {
             </InfoRow>
             <InfoRow label="Network">
               <span className="flex items-center gap-1 text-gray-300">
-                <span className="h-2 w-2 rounded-full bg-bnb-yellow" /> BNB Chain
+                <span className="h-2 w-2 rounded-full bg-bnb-yellow animate-pulse" /> BNB Chain
               </span>
             </InfoRow>
             <InfoRow label="Created">
@@ -1162,7 +1192,7 @@ export function AgentPageClient({ token }: { token: Token }) {
           </div>
 
           {/* Agent capabilities card */}
-          <div className="rounded-2xl border border-bnb-border bg-bnb-card p-4 flex flex-col gap-3">
+          <div className="rounded-2xl border border-bnb-yellow/10 glass p-4 flex flex-col gap-3">
             <h4 className="flex items-center gap-1.5 text-sm font-semibold text-white">
               <Cpu size={13} className="text-purple-400" /> Agent Capabilities
             </h4>
@@ -1181,7 +1211,7 @@ export function AgentPageClient({ token }: { token: Token }) {
             </div>
             <Link
               href="/launch"
-              className="mt-1 flex items-center justify-center gap-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20 py-2 text-xs font-semibold text-purple-400 transition-all hover:bg-purple-500/20"
+              className="mt-1 flex items-center justify-center gap-1.5 rounded-xl bg-purple-500/15 border border-purple-500/30 py-2 text-xs font-semibold text-purple-300 transition-all hover:bg-purple-500/25 hover:shadow-[0_0_16px_rgba(168,85,247,0.3)] hover:-translate-y-0.5"
             >
               <Puzzle size={11} /> Deploy Skill for this Agent
             </Link>

@@ -91,10 +91,13 @@ function CopyButton({ text }: { text: string }) {
 
 // ── StatPill ──────────────────────────────────────────────────────────────────
 
-function StatPill({ label, value, accent }: { label: string; value: string; accent?: string }) {
+function StatPill({ label, value, accent, icon }: { label: string; value: string; accent?: string; icon?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center rounded-xl border border-bnb-border bg-bnb-card px-4 py-3 text-center">
-      <span className="text-[10px] font-medium uppercase tracking-widest text-gray-600">{label}</span>
+    <div className="group flex flex-col items-center rounded-xl border border-bnb-yellow/10 glass px-4 py-3 text-center transition-all duration-200 hover:border-bnb-yellow/25 hover:shadow-[0_0_16px_rgba(243,186,47,0.1)]">
+      <div className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-widest text-gray-600 group-hover:text-gray-500 transition-colors">
+        {icon && <span className="opacity-60">{icon}</span>}
+        {label}
+      </div>
       <span className={`mt-1 font-mono text-base font-bold ${accent ?? "text-white"}`}>{value}</span>
     </div>
   );
@@ -130,7 +133,7 @@ function BondingCurveBar({
       : "from-blue-500 to-bnb-yellow";
 
   return (
-    <div className="rounded-2xl border border-bnb-border bg-bnb-card p-5">
+    <div className="rounded-2xl border border-bnb-yellow/10 glass p-5">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white">Bonding Curve Progress</h3>
         <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${token.isGraduated
@@ -147,7 +150,14 @@ function BondingCurveBar({
       <div className="relative h-4 w-full overflow-hidden rounded-full bg-white/[0.07]">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-700`}
-          style={{ width: `${Math.min(progress, 100)}%` }}
+          style={{
+            width: `${Math.min(progress, 100)}%`,
+            boxShadow: progress >= 75
+              ? "0 0 14px rgba(74,222,128,0.5), 0 0 28px rgba(74,222,128,0.2)"
+              : progress >= 50
+              ? "0 0 14px rgba(243,186,47,0.5), 0 0 28px rgba(243,186,47,0.2)"
+              : "0 0 14px rgba(59,130,246,0.4)",
+          }}
         />
         {/* Milestone ticks */}
         {MILESTONES.slice(0, -1).map(({ pct }) => (
@@ -170,15 +180,15 @@ function BondingCurveBar({
 
       {/* Stats row */}
       <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
-        <div className="rounded-lg bg-white/[0.03] p-2.5 text-center">
+        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
           <p className="text-gray-600">BNB Raised</p>
-          <p className="font-mono font-bold text-white mt-0.5">{bnbRaised} BNB</p>
+          <p className="font-mono font-bold text-bnb-yellow mt-0.5">{bnbRaised} BNB</p>
         </div>
-        <div className="rounded-lg bg-white/[0.03] p-2.5 text-center">
+        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
           <p className="text-gray-600">Target</p>
           <p className="font-mono font-bold text-white mt-0.5">69 BNB</p>
         </div>
-        <div className="rounded-lg bg-white/[0.03] p-2.5 text-center">
+        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
           <p className="text-gray-600">Remaining</p>
           <p className="font-mono font-bold text-bnb-yellow mt-0.5">
             {(69 - parseFloat(bnbRaised)).toFixed(2)} BNB
@@ -209,19 +219,25 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
   const cfg = TYPE_CONFIG[token.type];
 
   return (
-    <div className="rounded-2xl border border-bnb-border bg-bnb-card">
+    <div className="rounded-2xl border border-bnb-yellow/10 glass">
       {/* Tab bar */}
-      <div className="flex items-center gap-0.5 border-b border-bnb-border p-2">
+      <div className="flex items-center gap-0.5 border-b border-bnb-yellow/10 p-2">
         <button
           onClick={() => setTab("trades")}
-          className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${tab === "trades" ? "bg-white/[0.07] text-white" : "text-gray-500 hover:text-white"
+          className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 ${
+            tab === "trades"
+              ? "bg-bnb-yellow/10 text-bnb-yellow border border-bnb-yellow/25"
+              : "text-gray-500 border border-transparent hover:text-bnb-yellow/70"
             }`}
         >
           <Activity size={12} /> Trades
         </button>
         <button
           onClick={() => setTab("info")}
-          className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all ${tab === "info" ? "bg-white/[0.07] text-white" : "text-gray-500 hover:text-white"
+          className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 ${
+            tab === "info"
+              ? "bg-bnb-yellow/10 text-bnb-yellow border border-bnb-yellow/25"
+              : "text-gray-500 border border-transparent hover:text-bnb-yellow/70"
             }`}
         >
           <Info size={12} /> Token Info
@@ -268,12 +284,12 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
           {trades.map((t, i) => (
             <div
               key={i}
-              className="grid grid-cols-5 items-center px-4 py-2.5 text-xs hover:bg-white/[0.02] transition-colors"
+              className="grid grid-cols-5 items-center px-4 py-2.5 text-xs hover:bg-bnb-yellow/[0.025] transition-colors"
             >
               <span className={`w-fit rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
                 t.type === "buy"
-                  ? "bg-green-400/10 text-green-400"
-                  : "bg-red-400/10 text-red-400"
+                  ? "bg-green-400/10 text-green-400 shadow-[0_0_8px_rgba(74,222,128,0.2)]"
+                  : "bg-red-400/10 text-red-400 shadow-[0_0_8px_rgba(248,113,113,0.2)]"
               }`}>
                 {t.type}
               </span>
@@ -604,9 +620,9 @@ export function TokenDetailClient({ token }: { token: Token }) {
       {/* Back link */}
       <Link
         href="/"
-        className="mb-5 inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-white transition-colors"
+        className="mb-5 inline-flex items-center gap-1.5 text-sm text-bnb-yellow/50 hover:text-bnb-yellow transition-colors group"
       >
-        <ArrowLeft size={14} />
+        <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
         Back to Explore
       </Link>
 
@@ -614,7 +630,13 @@ export function TokenDetailClient({ token }: { token: Token }) {
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] text-3xl ring-1 ring-white/10">
+          <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-3xl border ${
+            detectedType === "agent"
+              ? "bg-purple-400/10 border-purple-400/25 shadow-[0_0_20px_rgba(192,132,252,0.2)]"
+              : detectedType === "skill"
+              ? "bg-green-400/10 border-green-400/25 shadow-[0_0_20px_rgba(74,222,128,0.2)]"
+              : "bg-bnb-yellow/10 border-bnb-yellow/25 shadow-[0_0_20px_rgba(243,186,47,0.2)]"
+          }`}>
             {detectedType === "agent" ? "🤖" : detectedType === "skill" ? "🧩" : "🟡"}
           </div>
           <div>
@@ -653,32 +675,40 @@ export function TokenDetailClient({ token }: { token: Token }) {
           </div>
         </div>
 
-        {/* Price + change */}
-        <div className="flex flex-col items-end gap-1">
-          <p className="font-mono text-3xl font-extrabold text-white">
-            {fmtUSD(finalPrice * liveBNBUSD)}
-          </p>
-          <p className="font-mono text-xs text-gray-600">
-            {finalPrice.toFixed(10)} BNB
-          </p>
-          <div className={`flex items-center gap-1 text-sm font-semibold ${isUp ? "text-green-400" : "text-red-400"}`}>
-            {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-            {isUp ? "+" : ""}{livePriceChange24h.toFixed(2)}% (24h)
+          {/* Price + change */}
+          <div className="flex flex-col items-end gap-1">
+            <p className="font-mono text-3xl font-extrabold text-white" style={{ textShadow: "0 0 30px rgba(255,255,255,0.15)" }}>
+              {fmtUSD(finalPrice * liveBNBUSD)}
+            </p>
+            <p className="font-mono text-xs text-gray-600">
+              {finalPrice.toFixed(10)} BNB
+            </p>
+            <div className={`flex items-center gap-1 text-sm font-semibold ${isUp ? "text-green-400" : "text-red-400"}`}>
+              {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+              {isUp ? "+" : ""}{livePriceChange24h.toFixed(2)}% (24h)
+            </div>
+            {!isGraduated && (
+              <div className="mt-2 flex items-center gap-1.5 rounded-xl bg-bnb-yellow/5 border border-bnb-yellow/15 px-3 py-1.5">
+                <Flame size={10} className="text-bnb-yellow/60" />
+                <span className="text-[10px] text-bnb-yellow/70 font-medium">{finalProgress}% to graduation</span>
+              </div>
+            )}
           </div>
-        </div>
       </div>
 
       {/* ── Quick stats strip ────────────────────────────────────────────────── */}
       <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatPill label="Market Cap" value={fmtUSD(liveToken.marketCap, true)} />
-        <StatPill label="24h Volume" value={fmtUSD(liveVolume24h, true)} />
+        <StatPill label="Market Cap" value={fmtUSD(liveToken.marketCap, true)} icon={<TrendingUp size={9} />} />
+        <StatPill label="24h Volume" value={fmtUSD(liveVolume24h, true)} icon={<Activity size={9} />} accent="text-green-400" />
         <StatPill
           label="Holders"
           value={(holders ?? liveToken.holders).toLocaleString()}
+          icon={<span style={{ fontSize: 9 }}>👥</span>}
         />
         <StatPill
           label="Rep Score"
           value={`${liveToken.reputationScore}/100`}
+          icon={<span style={{ fontSize: 9 }}>⭐</span>}
           accent={
             liveToken.reputationScore >= 75 ? "text-green-400"
               : liveToken.reputationScore >= 50 ? "text-bnb-yellow"
@@ -689,7 +719,10 @@ export function TokenDetailClient({ token }: { token: Token }) {
 
       {/* Description */}
       {token.description && (
-        <p className="mb-6 text-sm leading-relaxed text-gray-500">{token.description}</p>
+        <div className="mb-6 flex gap-3">
+          <div className="mt-1 h-full w-0.5 flex-shrink-0 rounded-full bg-bnb-yellow/20" />
+          <p className="text-sm leading-relaxed text-gray-500">{token.description}</p>
+        </div>
       )}
 
       {/* ── Main grid ─────────────────────────────────────────────────────────── */}
@@ -698,7 +731,13 @@ export function TokenDetailClient({ token }: { token: Token }) {
         {/* ── Left: chart + curve + trades ──────────────────────────────────── */}
         <div className="flex flex-col gap-5">
           {/* Price chart card */}
-          <div className="rounded-2xl border border-bnb-border bg-bnb-card p-5">
+          <div className="rounded-2xl border border-bnb-yellow/10 glass p-5">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-bnb-yellow/10 border border-bnb-yellow/20">
+                <Activity size={12} className="text-bnb-yellow" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">Price Chart</h3>
+            </div>
             <PriceChart token={liveToken as any} />
           </div>
 
@@ -730,24 +769,26 @@ export function TokenDetailClient({ token }: { token: Token }) {
           <BuySellPanel token={liveToken} curveAddress={curveAddress} curveLoading={curveLoading} />
 
           {/* Mini token info card */}
-          <div className="rounded-2xl border border-bnb-border bg-bnb-card p-4 flex flex-col gap-2.5 text-xs">
-            <h4 className="text-sm font-semibold text-white">Details</h4>
-            <div className="flex justify-between">
+          <div className="rounded-2xl border border-bnb-yellow/10 glass p-4 flex flex-col gap-2.5 text-xs">
+            <h4 className="flex items-center gap-1.5 text-sm font-semibold text-white">
+              <span className="h-1 w-4 rounded-full bg-bnb-yellow/60" /> Details
+            </h4>
+            <div className="flex justify-between border-b border-bnb-yellow/5 pb-2">
               <span className="text-gray-600">Supply</span>
               <span className="font-mono text-gray-300">{totalSupplyDisplay}</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b border-bnb-yellow/5 pb-2">
               <span className="text-gray-600">Platform fee</span>
               <span className="font-mono text-gray-300">{(token.feeBps ?? 100) / 100}%</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b border-bnb-yellow/5 pb-2">
               <span className="text-gray-600">Curve</span>
               <span className="font-mono text-gray-300">xy=k</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between border-b border-bnb-yellow/5 pb-2">
               <span className="text-gray-600">Network</span>
               <span className="flex items-center gap-1 text-gray-300">
-                <span className="inline-block h-2 w-2 rounded-full bg-bnb-yellow" />
+                <span className="inline-block h-2 w-2 rounded-full bg-bnb-yellow animate-pulse" />
                 BNB Chain
               </span>
             </div>

@@ -132,6 +132,44 @@ agentsRouter.get("/", async (_req: Request, res: Response) => {
   res.json({ agents: rows });
 });
 
+// ── GET /api/agents/by-token/:tokenAddress ───────────────────────────────────
+// Look up agent by the ERC-20 token address that gates access.
+// Returns id, name, status and – once deployed – chatUrl (proxy path).
+
+agentsRouter.get("/by-token/:tokenAddress", async (req: Request, res: Response) => {
+  const tokenAddress = String(req.params.tokenAddress).toLowerCase();
+
+  const { rows } = await db.query(
+    `SELECT id, name, description, status, error_message, created_at, updated_at
+     FROM agents
+     WHERE token_address = $1
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [tokenAddress]
+  );
+
+  if (rows.length === 0) { res.status(404).json({ error: "No agent found for this token address" }); return; }
+
+  const agent = rows[0];
+
+  // The chat URL the frontend should POST messages to.
+  // Routed through the token-gated proxy so the raw CreateOS URL stays hidden.
+  const chatUrl = agent.status === "deployed"
+    ? `/api/agent/${agent.id}/chat`
+    : null;
+
+  res.json({
+    id:          agent.id,
+    name:        agent.name,
+    description: agent.description ?? null,
+    status:      agent.status,
+    error:       agent.error_message ?? null,
+    chatUrl,
+    createdAt:   agent.created_at,
+    updatedAt:   agent.updated_at,
+  });
+});
+
 // ── GET /api/agents/:id ──────────────────────────────────────────────────────
 
 agentsRouter.get("/:id", async (req: Request, res: Response) => {
@@ -172,15 +210,23 @@ agentsRouter.get("/:id/status", async (req: Request, res: Response) => {
       .catch(() => []);
   }
 
+  // The proxy chat endpoint – available once deployed.
+  // Frontend prefixes NEXT_PUBLIC_API_URL to get the full URL.
+  const chatUrl = agent.status === "deployed"
+    ? `/api/agent/${agent.id}/chat`
+    : null;
+
   res.json({
     id:          agent.id,
     name:        agent.name,
     status:      agent.status,
     error:       agent.error_message ?? null,
-    // Only give the agent endpoint URL once deployed
+    // Frontend page URL (for navigation)
     agentUrl:    agent.status === "deployed"
                    ? `/agent/${agent.id}`
                    : null,
+    // Proxy chat endpoint – POST messages here from the chatbot
+    chatUrl,
     buildLogs,
     createdAt:   agent.created_at,
     updatedAt:   agent.updated_at,

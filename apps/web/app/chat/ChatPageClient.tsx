@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useAccount, usePublicClient } from "wagmi";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { bscTestnet } from "wagmi/chains";
 import { formatEther } from "viem";
-import { MessageSquare, Send, Cpu, Zap, ChevronRight, CheckSquare, Square, Bot, User, Loader2, AlertCircle } from "lucide-react";
+import { MessageSquare, Send, Cpu, Zap, ChevronRight, CheckSquare, Square, Bot, User, Loader2, AlertCircle, CheckCircle, Radio } from "lucide-react";
 import { useTokens, type Token } from "../../hooks/useTokens";
 import { ERC20_ABI } from "../../lib/contracts";
 
@@ -22,6 +22,18 @@ interface SkillInfo {
   symbol:      string;
   description: string;
   address:     `0x${string}`;
+}
+
+interface AgentDbRecord {
+  id:      string;
+  status:  string;
+  chatUrl: string | null;   // e.g. /api/agent/{id}/chat  (null = not deployed yet)
+}
+
+// Canonical access-message the user must sign to use the proxy endpoint.
+// Must match buildAccessMessage in apps/api/src/lib/web3.ts.
+function buildAccessMessage(agentId: string, timestampSeconds: number): string {
+  return `AgentLaunch access\nagentId: ${agentId}\ntimestamp: ${timestampSeconds}`;
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -162,7 +174,8 @@ function ChatBubble({ msg }: { msg: Message }) {
 
 export function ChatPageClient() {
   const { address, isConnected } = useAccount();
-  const publicClient = usePublicClient({ chainId: bscTestnet.id });
+  const publicClient  = usePublicClient({ chainId: bscTestnet.id });
+  const { data: walletClient } = useWalletClient({ chainId: bscTestnet.id });
   const { tokens, isLoading: tokensLoading } = useTokens();
 
   // ── All agent tokens from events ──────────────────────────────────────────
@@ -222,6 +235,29 @@ export function ChatPageClient() {
     ? (agentBalances.get(selectedAgent.address.toLowerCase()) ?? 0n)
     : 0n;
   const totalCredits = Math.floor(Number(formatEther(agentBalance)) * CREDITS_PER_TOKEN);
+
+  // ── Fetch agent DB record (id + chatUrl) when agent is selected ───────────
+  const [agentDb,        setAgentDb]        = useState<AgentDbRecord | null>(null);
+  const [agentDbLoading, setAgentDbLoading] = useState(false);
+
+  useEffect(() => {
+    setAgentDb(null);
+    if (!selectedAgent) return;
+
+    let cancelled = false;
+    setAgentDbLoading(true);
+
+    fetch(`${API_URL}/api/agents/by-token/${selectedAgent.address}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (cancelled || !data) return;
+        setAgentDb({ id: data.id, status: data.status, chatUrl: data.chatUrl ?? null });
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setAgentDbLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [selectedAgent?.address]);
 
   // ── Skills for selected agent (from events, filtered to user-held) ────────
   const agentSkillTokens = useMemo(() => {
@@ -345,19 +381,47 @@ export function ChatPageClient() {
     setSending(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/chat`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({
-          agentTokenAddress: selectedAgent.address,
-          agentName:         selectedAgent.name,
-          agentDescription:  selectedAgent.description,
-          userAddress:       address,
-          message:           userMsg.content,
-          selectedSkills:    activeSkills.map((s) => ({ name: s.name, symbol: s.symbol })),
-          history:           messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
-        }),
-      });
+      // ── Route through the live proxy if agent is deployed ──────────────
+      const isLive = !!agentDb?.chatUrl && agentDb.status === "deployed";
+
+      let res: Response;
+
+      if (isLive && walletClient && agentDb) {
+        // Sign the canonical access-message for the token-gate middleware.
+        const timestampSeconds = Math.floor(Date.now() / 1000);
+        const message = buildAccessMessage(agentDb.id, timestampSeconds);
+        const signature = await walletClient.signMessage({ message });
+
+        res = await fetch(`${API_URL}${agentDb.chatUrl}`, {
+          method:  "POST",
+          headers: {
+            "Content-Type":    "application/json",
+            "x-wallet-address": address,
+            "x-signature":      signature,
+            "x-timestamp":      String(timestampSeconds),
+          },
+          body: JSON.stringify({
+            message:        userMsg.content,
+            selectedSkills: activeSkills.map((s) => ({ name: s.name, symbol: s.symbol })),
+            history:        messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          }),
+        });
+      } else {
+        // Fallback: standard /api/chat endpoint (no live container yet)
+        res = await fetch(`${API_URL}/api/chat`, {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({
+            agentTokenAddress: selectedAgent.address,
+            agentName:         selectedAgent.name,
+            agentDescription:  selectedAgent.description,
+            userAddress:       address,
+            message:           userMsg.content,
+            selectedSkills:    activeSkills.map((s) => ({ name: s.name, symbol: s.symbol })),
+            history:           messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          }),
+        });
+      }
 
       if (res.status === 403) {
         const err = await res.json();
@@ -390,7 +454,7 @@ export function ChatPageClient() {
       setSending(false);
       setTimeout(() => textareaRef.current?.focus(), 50);
     }
-  }, [input, selectedAgent, address, sending, creditsRemaining, activeSkills, messages]);
+  }, [input, selectedAgent, address, sending, creditsRemaining, activeSkills, messages, agentDb, walletClient]);
 
   // Enter to send (shift+enter = newline)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -504,6 +568,24 @@ export function ChatPageClient() {
                 <p className="text-sm font-semibold text-white">{selectedAgent.name}</p>
                 <p className="text-[11px] text-[#6b7280]">${selectedAgent.symbol}</p>
               </div>
+              {/* Live-endpoint badge */}
+              {agentDbLoading ? (
+                <Loader2 size={11} className="animate-spin text-[#6b7280]" />
+              ) : agentDb?.status === "deployed" && agentDb.chatUrl ? (
+                <span className="flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[10px] font-medium text-green-400">
+                  <Radio size={8} className="animate-pulse" />
+                  Live endpoint
+                </span>
+              ) : agentDb?.status === "deploying" ? (
+                <span className="flex items-center gap-1 rounded-full border border-bnb-yellow/30 bg-bnb-yellow/10 px-2 py-0.5 text-[10px] font-medium text-bnb-yellow">
+                  <Loader2 size={8} className="animate-spin" />
+                  Deploying…
+                </span>
+              ) : agentDb ? (
+                <span className="flex items-center gap-1 rounded-full border border-[#2a2a35] bg-[#1e1e26] px-2 py-0.5 text-[10px] text-[#6b7280]">
+                  Fallback mode
+                </span>
+              ) : null}
             </div>
           ) : (
             <p className="text-sm text-[#6b7280]">No agent selected</p>

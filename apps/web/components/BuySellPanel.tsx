@@ -135,17 +135,21 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
 
   if (token.isGraduated) {
     return (
-      <div className="rounded-2xl border border-bnb-border bg-bnb-card p-6 text-center">
-        <div className="mb-3 text-4xl">🎓</div>
-        <h3 className="font-bold text-white">Graduated to DEX</h3>
-        <p className="mt-1 text-sm text-gray-400">
+      <div className="rounded-2xl border border-bnb-yellow/20 glass p-6 text-center">
+        <div className="mb-3 flex items-center justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-bnb-yellow/10 border border-bnb-yellow/20 text-4xl animate-glow-pulse">
+            🎓
+          </div>
+        </div>
+        <h3 className="font-bold text-white shimmer-text">Graduated to DEX</h3>
+        <p className="mt-1 text-sm text-gray-500">
           ${token.symbol} now trades on PancakeSwap. Buy on the DEX below.
         </p>
         <a
           href="https://pancakeswap.finance"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-bnb-yellow px-5 py-3 text-sm font-bold text-black hover:opacity-90 transition-opacity"
+          className="btn-neon mt-5 flex items-center justify-center gap-2 px-5 py-3 text-sm"
         >
           Trade on PancakeSwap
           <ArrowUpRight size={15} />
@@ -155,23 +159,25 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
   }
 
   return (
-    <div className="rounded-2xl border border-bnb-border bg-bnb-card">
+    <div className="rounded-2xl border border-bnb-yellow/10 glass">
       {/* Tabs */}
-      <div className="flex gap-1 p-2">
+      <div className="flex gap-1.5 p-2">
         <button
           onClick={() => { setTab("buy"); setAmount(""); reset?.(); }}
-          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${tab === "buy"
-              ? "bg-green-500 text-white shadow-lg shadow-green-500/20"
-              : "text-gray-500 hover:text-white"
+          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-200 ${
+            tab === "buy"
+              ? "bg-green-500/15 text-green-300 border border-green-500/40 shadow-[0_0_18px_rgba(74,222,128,0.3)]"
+              : "text-gray-600 border border-transparent hover:text-green-400 hover:border-green-500/20"
             }`}
         >
           Buy
         </button>
         <button
           onClick={() => { setTab("sell"); setAmount(""); reset?.(); }}
-          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${tab === "sell"
-              ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
-              : "text-gray-500 hover:text-white"
+          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-200 ${
+            tab === "sell"
+              ? "bg-red-500/15 text-red-300 border border-red-500/40 shadow-[0_0_18px_rgba(248,113,113,0.3)]"
+              : "text-gray-600 border border-transparent hover:text-red-400 hover:border-red-500/20"
             }`}
         >
           Sell
@@ -190,10 +196,14 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
         )}
 
         {/* Amount input */}
-        <div className="rounded-xl border border-bnb-border bg-bnb-dark p-4">
+        <div className={`rounded-xl border p-4 glass transition-all duration-200 ${
+          tab === "buy" ? "border-green-500/20 focus-within:border-green-500/40 focus-within:shadow-[0_0_14px_rgba(74,222,128,0.15)]" : "border-red-500/20 focus-within:border-red-500/40 focus-within:shadow-[0_0_14px_rgba(248,113,113,0.15)]"
+        }`}>
           <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
-            <span>{tab === "buy" ? "You pay" : `You sell`}</span>
-            <span className="font-medium text-gray-300">
+            <span className="font-medium">{tab === "buy" ? "You pay" : `You sell`}</span>
+            <span className={`font-semibold text-xs ${
+              tab === "buy" ? "text-green-400" : "text-red-400"
+            }`}>
               {tab === "buy" ? "BNB" : token.symbol}
             </span>
           </div>
@@ -206,7 +216,11 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
               onChange={(e) => setAmount(e.target.value)}
               className="flex-1 bg-transparent text-2xl font-bold text-white outline-none placeholder-gray-700"
             />
-            <span className="rounded-lg bg-white/10 px-3 py-1.5 text-sm font-medium text-white">
+            <span className={`rounded-lg px-3 py-1.5 text-sm font-bold border ${
+              tab === "buy"
+                ? "bg-green-500/10 border-green-500/30 text-green-300"
+                : "bg-red-500/10 border-red-500/30 text-red-300"
+            }`}>
               {tab === "buy" ? "BNB" : token.symbol}
             </span>
           </div>
@@ -219,9 +233,9 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
               <button
                 key={p}
                 onClick={() => setAmount(p)}
-                className={`rounded-lg border py-1.5 text-xs font-medium transition-all ${amount === p
-                    ? "border-green-500/40 bg-green-500/10 text-green-400"
-                    : "border-bnb-border bg-bnb-dark text-gray-400 hover:border-white/20 hover:text-white"
+                className={`rounded-lg border py-1.5 text-xs font-semibold transition-all duration-150 ${amount === p
+                    ? "border-green-500/40 bg-green-500/10 text-green-300 shadow-[0_0_10px_rgba(74,222,128,0.2)]"
+                    : "border-bnb-yellow/10 glass text-gray-500 hover:border-green-500/20 hover:text-green-400"
                   }`}
               >
                 {p} BNB
@@ -232,7 +246,7 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
 
         {/* Quote */}
         {bnbAmt > 0 && (
-          <div className="rounded-xl bg-black/30 p-3 text-sm">
+          <div className="rounded-xl glass border border-bnb-yellow/10 p-3 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-gray-400">You receive</span>
               <span className="font-mono font-semibold text-white">
@@ -277,9 +291,10 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
         <button
           onClick={handleAction}
           disabled={isLoading || curveLoading || (isConnected && (!amount || bnbAmt <= 0))}
-          className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all disabled:opacity-50 ${tab === "buy"
-              ? "bg-green-500 text-white hover:bg-green-400 shadow-lg shadow-green-500/20"
-              : "bg-red-500 text-white hover:bg-red-400 shadow-lg shadow-red-500/20"
+          className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all duration-200 disabled:opacity-40 active:scale-[0.98] ${
+            tab === "buy"
+              ? "bg-gradient-to-r from-green-500 to-green-400 text-white shadow-[0_0_22px_rgba(74,222,128,0.35)] hover:shadow-[0_0_32px_rgba(74,222,128,0.55)] hover:-translate-y-0.5"
+              : "bg-gradient-to-r from-red-500 to-red-400 text-white shadow-[0_0_22px_rgba(248,113,113,0.35)] hover:shadow-[0_0_32px_rgba(248,113,113,0.55)] hover:-translate-y-0.5"
             }`}
         >
           {curveLoading ? (
