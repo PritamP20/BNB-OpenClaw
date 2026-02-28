@@ -19,15 +19,15 @@ const nextConfig = {
   // Next.js 16 uses Turbopack by default for both dev and build.
   // An empty turbopack object silences the "webpack config present" warning.
   turbopack: {},
-  // Proxy /api/* → internal Express API on port 4000.
-  // This means NEXT_PUBLIC_API_URL can be set to "/api" so browser calls
-  // go to the Next.js server (same host/port), which forwards to localhost:4000.
-  // Avoids hardcoding the public hostname in the JS bundle.
+  // Proxy /api/* → Express API.
+  // Docker/NodeOps: NEXT_PUBLIC_API_URL is unset → falls back to localhost:4000
+  // Vercel: set NEXT_PUBLIC_API_URL=https://your-api.up.railway.app
   async rewrites() {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:4000";
     return [
       {
         source: "/api/:path*",
-        destination: "http://127.0.0.1:4000/:path*",
+        destination: `${apiBase}/:path*`,
       },
     ];
   },
