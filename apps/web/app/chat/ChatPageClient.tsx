@@ -78,8 +78,8 @@ function AgentTreeNode({
           selected
             ? "border-[#F3BA2F] bg-[#F3BA2F]/10"
             : hasTokens
-            ? "border-[#2a2a35] bg-[#16161a] hover:border-[#F3BA2F]/40"
-            : "border-[#2a2a35] bg-[#16161a]/50 opacity-40 cursor-not-allowed"
+            ? "border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] hover:border-[#F3BA2F]/40"
+            : "border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)]/50 opacity-40 cursor-not-allowed"
         }`}
       >
         <div className="flex items-center gap-2">
@@ -132,9 +132,9 @@ function AgentTreeNode({
                   <div key={s.address} className="flex items-stretch">
                     {/* Tree connector */}
                     <div className="flex flex-col items-center w-5 flex-shrink-0">
-                      <div className="w-px flex-1 bg-[#2a2a35]" />
-                      <div className={`w-3 border-b border-[#2a2a35] mt-0 ${ isLast ? "mb-auto" : "" }`} />
-                      {!isLast && <div className="w-px flex-1 bg-[#2a2a35]" />}
+                      <div className="w-px flex-1 bg-[rgba(255,255,255,0.05)]" />
+                      <div className={`w-3 border-b border-[rgba(255,255,255,0.05)] mt-0 ${ isLast ? "mb-auto" : "" }`} />
+                      {!isLast && <div className="w-px flex-1 bg-[rgba(255,255,255,0.05)]" />}
                     </div>
                     {/* Skill row */}
                     <button
@@ -146,13 +146,13 @@ function AgentTreeNode({
                           ? "opacity-35 cursor-not-allowed"
                           : isActive
                           ? "bg-[#F3BA2F]/10 hover:bg-[#F3BA2F]/15"
-                          : "hover:bg-[#2a2a35]"
+                          : "hover:bg-[rgba(255,255,255,0.05)]"
                       }`}
                     >
                       <Zap
                         size={10}
                         className={`flex-shrink-0 ${
-                          isActive ? "text-[#F3BA2F]" : owned ? "text-[#4a4a55]" : "text-[#2a2a35]"
+                          isActive ? "text-[#F3BA2F]" : owned ? "text-[#4a4a55]" : "text-[rgba(255,255,255,0.05)]"
                         }`}
                       />
                       <span className={`truncate font-medium ${
@@ -196,7 +196,7 @@ function ChatBubble({ msg }: { msg: Message }) {
         className={`max-w-[70%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
           isUser
             ? "bg-[#F3BA2F] text-black rounded-tr-sm"
-            : "bg-[#1e1e26] border border-[#2a2a35] text-[#e0e0e0] rounded-tl-sm"
+            : "bg-[#1e1e26] border border-[rgba(255,255,255,0.05)] text-[#e0e0e0] rounded-tl-sm"
         }`}
       >
         {/* Render simple markdown-lite: **bold** and _italic_ */}
@@ -530,11 +530,11 @@ export function ChatPageClient() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-[#0e0e11] overflow-hidden">
+    <div className="flex h-[calc(100vh-64px)] bg-[#0a0a0e] overflow-hidden">
       {/* ── Left sidebar ──────────────────────────────────────────────────── */}
-      <aside className="w-80 flex-shrink-0 border-r border-[#2a2a35] flex flex-col bg-[#0e0e11]">
+      <aside className="w-80 flex-shrink-0 border-r border-[rgba(255,255,255,0.05)] flex flex-col bg-[#0a0a0e]">
         {/* Header */}
-        <div className="p-4 border-b border-[#2a2a35]">
+        <div className="p-4 border-b border-[rgba(255,255,255,0.05)]">
           <h2 className="text-sm font-semibold text-white flex items-center gap-2">
             <Cpu size={14} className="text-[#F3BA2F]" />
             Your Agents
@@ -545,7 +545,7 @@ export function ChatPageClient() {
         {/* Connection gate */}
         {!isConnected ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 p-6 text-center">
-            <MessageSquare size={32} className="text-[#2a2a35]" />
+            <MessageSquare size={32} className="text-[rgba(255,255,255,0.05)]" />
             <p className="text-sm text-[#6b7280]">Connect your wallet using the button in the top-right navbar.</p>
           </div>
         ) : (tokensLoading || (agentTokens.length > 0 && balancesLoading)) ? (
@@ -554,7 +554,7 @@ export function ChatPageClient() {
           </div>
         ) : ownedAgentTokens.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <Bot size={32} className="text-[#2a2a35]" />
+            <Bot size={32} className="text-[rgba(255,255,255,0.05)]" />
             <p className="text-sm text-[#6b7280]">
               {agentTokens.length === 0
                 ? "No agent tokens found on BSC Testnet"
@@ -588,7 +588,7 @@ export function ChatPageClient() {
       {/* ── Main chat area ─────────────────────────────────────────────────── */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Chat header */}
-        <div className="h-14 border-b border-[#2a2a35] flex items-center justify-between px-5 flex-shrink-0">
+        <div className="h-14 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between px-5 flex-shrink-0">
           {selectedAgent ? (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F3BA2F]/30 to-purple-600/30 flex items-center justify-center">
@@ -612,7 +612,7 @@ export function ChatPageClient() {
                   Deploying…
                 </span>
               ) : agentDb ? (
-                <span className="flex items-center gap-1 rounded-full border border-[#2a2a35] bg-[#1e1e26] px-2 py-0.5 text-[10px] text-[#6b7280]">
+                <span className="flex items-center gap-1 rounded-full border border-[rgba(255,255,255,0.05)] bg-[#1e1e26] px-2 py-0.5 text-[10px] text-[#6b7280]">
                   Fallback mode
                 </span>
               ) : null}
@@ -623,7 +623,7 @@ export function ChatPageClient() {
 
           {/* Credit counter */}
           {selectedAgent && agentBalance > 0n && (
-            <div className="flex items-center gap-2 text-xs bg-[#1e1e26] border border-[#2a2a35] rounded-full px-3 py-1.5">
+            <div className="flex items-center gap-2 text-xs bg-[#1e1e26] border border-[rgba(255,255,255,0.05)] rounded-full px-3 py-1.5">
               <Zap size={11} className="text-[#F3BA2F]" />
               <span className={creditsRemaining <= 5 ? "text-red-400" : "text-white"}>
                 {creditsRemaining}
@@ -638,7 +638,7 @@ export function ChatPageClient() {
           {!isConnected ? (
             /* Not connected */
             <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
-              <MessageSquare size={48} className="text-[#2a2a35]" />
+              <MessageSquare size={48} className="text-[rgba(255,255,255,0.05)]" />
               <h3 className="text-lg font-semibold text-white">Connect to chat</h3>
               <p className="text-sm text-[#6b7280] max-w-xs">
                 Connect your wallet to access token-gated AI chat with your on-chain agents.
@@ -648,7 +648,7 @@ export function ChatPageClient() {
           ) : !selectedAgent ? (
             /* No agent selected */
             <div className="h-full flex flex-col items-center justify-center gap-4 text-center">
-              <Bot size={48} className="text-[#2a2a35]" />
+              <Bot size={48} className="text-[rgba(255,255,255,0.05)]" />
               <h3 className="text-lg font-semibold text-white">Select an agent</h3>
               <p className="text-sm text-[#6b7280] max-w-xs">
                 Choose an agent from the left panel. You need to hold the agent's token to unlock AI credits.
@@ -708,7 +708,7 @@ export function ChatPageClient() {
                   <div className="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center flex-shrink-0">
                     <Bot size={14} />
                   </div>
-                  <div className="bg-[#1e1e26] border border-[#2a2a35] rounded-2xl rounded-tl-sm px-4 py-3">
+                  <div className="bg-[#1e1e26] border border-[rgba(255,255,255,0.05)] rounded-2xl rounded-tl-sm px-4 py-3">
                     <div className="flex gap-1 items-center h-4">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#F3BA2F]/60 animate-bounce [animation-delay:0ms]" />
                       <span className="w-1.5 h-1.5 rounded-full bg-[#F3BA2F]/60 animate-bounce [animation-delay:150ms]" />
@@ -742,12 +742,12 @@ export function ChatPageClient() {
         )}
 
         {/* Input area */}
-        <div className="border-t border-[#2a2a35] p-4">
+        <div className="border-t border-[rgba(255,255,255,0.05)] p-4">
           <div
-            className={`flex gap-3 items-end bg-[#16161a] border rounded-xl px-4 py-3 transition-colors ${
+            className={`flex gap-3 items-end bg-[rgba(255,255,255,0.02)] border rounded-xl px-4 py-3 transition-colors ${
               selectedAgent && agentBalance > 0n
-                ? "border-[#2a2a35] focus-within:border-[#F3BA2F]/50"
-                : "border-[#2a2a35] opacity-50"
+                ? "border-[rgba(255,255,255,0.05)] focus-within:border-[#F3BA2F]/50"
+                : "border-[rgba(255,255,255,0.05)] opacity-50"
             }`}
           >
             <textarea

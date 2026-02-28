@@ -143,7 +143,7 @@ export function AgentSkillGraph({
   const selectedSkill = selected !== null ? skills[selected] : null;
 
   return (
-    <div className="rounded-2xl border border-bnb-yellow/10 glass overflow-hidden">
+    <div className="rounded-2xl border border-white/[0.04] glass overflow-hidden">
       {/* Top accent bar */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
 
@@ -171,7 +171,7 @@ export function AgentSkillGraph({
                 <span className="text-gray-600">/ {n} unlocked</span>
               </div>
             )}
-            <div className="rounded-full border border-bnb-yellow/15 bg-bnb-yellow/5 px-2.5 py-1 text-[11px] font-mono text-bnb-yellow/70">
+            <div className="rounded-full border border-bnb-yellow/15 bg-white/[0.03] px-2.5 py-1 text-[11px] font-mono text-gray-500">
               {n} skill{n !== 1 ? "s" : ""}
             </div>
           </div>
@@ -358,10 +358,10 @@ export function AgentSkillGraph({
 
           {/* Selected skill detail panel */}
           {selectedSkill ? (
-            <div className="mx-4 mt-3 mb-4 rounded-xl border border-bnb-yellow/20 bg-gradient-to-br from-bnb-yellow/[0.04] to-purple-500/[0.03] p-4">
+            <div className="mx-4 mt-3 mb-4 rounded-xl border border-white/[0.06] bg-gradient-to-br from-white/[0.02] to-purple-500/[0.02] p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-bnb-yellow/15 glass text-xl shadow-[0_0_12px_rgba(243,186,47,0.15)]">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.06] glass text-xl shadow-card">
                     {getSkillIcon(selectedSkill.symbol)}
                   </div>
                   <div>
@@ -399,7 +399,7 @@ export function AgentSkillGraph({
               </div>
               <Link
                 href={`/token/${selectedSkill.address}`}
-                className="mt-3 flex items-center gap-1.5 rounded-full border border-bnb-yellow/25 bg-bnb-yellow/10 px-3 py-1.5 text-[11px] font-semibold text-bnb-yellow hover:bg-bnb-yellow/20 hover:shadow-[0_0_12px_rgba(243,186,47,0.2)] transition-all w-fit"
+                className="mt-3 flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-gray-300 hover:bg-white/[0.06] hover:text-white transition-all w-fit"
               >
                 View Skill Token <ExternalLink size={9} />
               </Link>

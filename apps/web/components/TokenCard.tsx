@@ -4,9 +4,9 @@ import { Token } from "../hooks/useTokens";
 import { formatUSD, timeAgo } from "../lib/mock-data";
 
 const TYPE_CONFIG = {
-  agent:  { label: "AI Agent", icon: Bot,    color: "text-purple-400", bg: "rgba(192,132,252,0.1)", border: "rgba(192,132,252,0.25)", glow: "rgba(192,132,252,0.12)" },
-  normal: { label: "Token",    icon: Coins,  color: "text-bnb-yellow",  bg: "rgba(243,186,47,0.1)",  border: "rgba(243,186,47,0.25)",  glow: "rgba(243,186,47,0.1)"   },
-  skill:  { label: "Skill",    icon: Puzzle, color: "text-green-400",  bg: "rgba(74,222,128,0.1)",  border: "rgba(74,222,128,0.25)",  glow: "rgba(74,222,128,0.1)"   },
+  agent:  { label: "AI Agent", icon: Bot,    color: "text-purple-400", bg: "rgba(168,85,247,0.07)", border: "rgba(168,85,247,0.15)", glow: "rgba(168,85,247,0.1)" },
+  normal: { label: "Token",    icon: Coins,  color: "text-bnb-yellow",  bg: "rgba(243,186,47,0.07)",  border: "rgba(243,186,47,0.15)",  glow: "rgba(243,186,47,0.08)"   },
+  skill:  { label: "Skill",    icon: Puzzle, color: "text-emerald-400",  bg: "rgba(52,211,153,0.07)",  border: "rgba(52,211,153,0.15)",  glow: "rgba(52,211,153,0.08)"   },
 };
 
 const EMOJI_MAP: Record<Token["type"], string[]> = {
@@ -20,11 +20,13 @@ function TokenAvatar({ name, type }: { name: string; type: Token["type"] }) {
   const idx = (name.charCodeAt(0) || 0) % EMOJI_MAP[type].length;
   return (
     <div
-      className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-xl overflow-hidden"
+      className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-lg overflow-hidden"
       style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}
     >
       {/* Inner glow ring */}
-      <div className="absolute inset-0 rounded-2xl opacity-50" style={{ boxShadow: `inset 0 0 12px ${cfg.glow}` }} />
+      <div className="absolute inset-0 rounded-xl opacity-40" style={{ boxShadow: `inset 0 0 10px ${cfg.glow}` }} />
+      {/* Top highlight */}
+      <div className="absolute inset-x-0 top-0 h-1/2 rounded-t-xl bg-gradient-to-b from-white/[0.06] to-transparent" />
       <span className="relative z-10">{EMOJI_MAP[type][idx]}</span>
     </div>
   );
@@ -38,26 +40,27 @@ export function TokenCard({ token }: { token: Token }) {
   return (
     <Link href={`/token/${token.address}`}>
       <div
-        className="group relative flex flex-col gap-3 rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:-translate-y-1"
+        className="group relative flex flex-col gap-3 rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:-translate-y-1.5"
         style={{
-          background: "rgba(14,14,20,0.85)",
-          border: "1px solid rgba(243,186,47,0.1)",
-          backdropFilter: "blur(16px)",
+          background: "linear-gradient(145deg, rgba(14,14,22,0.9) 0%, rgba(10,10,16,0.95) 100%)",
+          border: "1px solid rgba(255,255,255,0.04)",
+          backdropFilter: "blur(20px)",
+          boxShadow: "0 2px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03)",
         }}
       >
         {/* Hover glow border */}
         <div
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
           style={{
-            boxShadow: `0 0 0 1px rgba(243,186,47,0.3), 0 0 24px rgba(243,186,47,0.07), 0 8px 32px rgba(0,0,0,0.5)`,
+            boxShadow: `0 0 0 1px rgba(243,186,47,0.2), 0 0 32px rgba(243,186,47,0.05), 0 12px 40px rgba(0,0,0,0.4)`,
           }}
         />
 
-        {/* Gradient corner accent */}
+        {/* Top shine on hover */}
         <div
-          className="absolute top-0 right-0 h-16 w-16 rounded-2xl opacity-20 pointer-events-none"
+          className="absolute inset-x-0 top-0 h-24 rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
           style={{
-            background: `radial-gradient(circle at 100% 0%, ${cfg.glow} 0%, transparent 70%)`,
+            background: `linear-gradient(180deg, rgba(243,186,47,0.03) 0%, transparent 100%)`,
           }}
         />
 
@@ -103,10 +106,10 @@ export function TokenCard({ token }: { token: Token }) {
             <div
               key={label}
               className="rounded-xl px-3 py-2"
-              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)" }}
             >
-              <p className="text-[10px] text-gray-600 mb-0.5">{label}</p>
-              <p className="font-mono text-sm font-bold text-white">{value}</p>
+              <p className="text-[10px] text-gray-600 mb-0.5 tracking-wide uppercase">{label}</p>
+              <p className="font-mono text-[13px] font-bold text-gray-200">{value}</p>
             </div>
           ))}
         </div>
@@ -135,39 +138,39 @@ export function TokenCard({ token }: { token: Token }) {
         {/* Graduation progress */}
         <div className="relative z-10">
           <div className="mb-1.5 flex items-center justify-between text-[10px]">
-            <span className="flex items-center gap-1 text-gray-600">
-              <Zap size={9} className="text-bnb-yellow/60" />
+            <span className="flex items-center gap-1 text-gray-600 tracking-wide">
+              <Zap size={8} className="text-bnb-yellow/50" />
               Bonding curve
             </span>
             <span
-              className="font-mono font-bold"
-              style={{ color: token.isGraduated ? "#4ade80" : "#F3BA2F" }}
+              className="font-mono font-bold tracking-tight"
+              style={{ color: token.isGraduated ? "#34d399" : "#F3BA2F" }}
             >
               {token.graduationProgress}%
             </span>
           </div>
           <div
-            className="relative h-1.5 w-full overflow-hidden rounded-full"
-            style={{ background: "rgba(255,255,255,0.07)" }}
+            className="relative h-1 w-full overflow-hidden rounded-full"
+            style={{ background: "rgba(255,255,255,0.05)" }}
           >
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${token.graduationProgress}%`,
                 background: token.isGraduated
-                  ? "linear-gradient(90deg, #4ade80, #22d3ee)"
-                  : "linear-gradient(90deg, #F3BA2F, #ffe07a)",
+                  ? "linear-gradient(90deg, #34d399, #22d3ee)"
+                  : "linear-gradient(90deg, #F3BA2F, #ffe999)",
                 boxShadow: token.isGraduated
-                  ? "0 0 8px rgba(74,222,128,0.5)"
-                  : "0 0 8px rgba(243,186,47,0.5)",
+                  ? "0 0 6px rgba(52,211,153,0.4)"
+                  : "0 0 6px rgba(243,186,47,0.4)",
               }}
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="relative z-10 flex items-center justify-between text-[11px] text-gray-600">
-          <span>{token.holders.toLocaleString()} holders</span>
+        <div className="relative z-10 flex items-center justify-between text-[10px] text-gray-600">
+          <span className="tracking-wide">{token.holders.toLocaleString()} holders</span>
           <span>{timeAgo(token.createdAt)}</span>
         </div>
       </div>

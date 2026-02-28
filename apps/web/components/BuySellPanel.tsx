@@ -135,70 +135,73 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
 
   if (token.isGraduated) {
     return (
-      <div className="rounded-2xl border border-bnb-yellow/20 glass p-6 text-center">
-        <div className="mb-3 flex items-center justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-bnb-yellow/10 border border-bnb-yellow/20 text-4xl animate-glow-pulse">
+      <div className="rounded-2xl border border-white/[0.04] p-6 text-center" style={{ background: "rgba(255,255,255,0.015)", backdropFilter: "blur(24px)" }}>
+        <div className="mb-4 flex items-center justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-bnb-yellow/[0.06] border border-bnb-yellow/15 text-4xl animate-breathe">
             🎓
           </div>
         </div>
-        <h3 className="font-bold text-white shimmer-text">Graduated to DEX</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="font-bold text-white shimmer-text text-lg">Graduated to DEX</h3>
+        <p className="mt-2 text-sm text-gray-600">
           ${token.symbol} now trades on PancakeSwap. Buy on the DEX below.
         </p>
         <a
           href="https://pancakeswap.finance"
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-neon mt-5 flex items-center justify-center gap-2 px-5 py-3 text-sm"
+          className="btn-neon mt-6 flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm"
         >
           Trade on PancakeSwap
-          <ArrowUpRight size={15} />
+          <ArrowUpRight size={14} />
         </a>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-bnb-yellow/10 glass">
+    <div className="rounded-2xl border border-white/[0.04] overflow-hidden" style={{ background: "rgba(255,255,255,0.015)", backdropFilter: "blur(24px)" }}>
+      {/* Top accent */}
+      <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(243,186,47,0.15) 50%, transparent)" }} />
+
       {/* Tabs */}
-      <div className="flex gap-1.5 p-2">
+      <div className="flex gap-1.5 p-2.5">
         <button
           onClick={() => { setTab("buy"); setAmount(""); reset?.(); }}
-          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-200 ${
+          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-300 ${
             tab === "buy"
-              ? "bg-green-500/15 text-green-300 border border-green-500/40 shadow-[0_0_18px_rgba(74,222,128,0.3)]"
-              : "text-gray-600 border border-transparent hover:text-green-400 hover:border-green-500/20"
+              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 shadow-[0_0_16px_rgba(52,211,153,0.15)]"
+              : "text-gray-700 border border-transparent hover:text-emerald-400/60 hover:border-emerald-500/10"
             }`}
         >
           Buy
         </button>
         <button
           onClick={() => { setTab("sell"); setAmount(""); reset?.(); }}
-          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-200 ${
+          className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all duration-300 ${
             tab === "sell"
-              ? "bg-red-500/15 text-red-300 border border-red-500/40 shadow-[0_0_18px_rgba(248,113,113,0.3)]"
-              : "text-gray-600 border border-transparent hover:text-red-400 hover:border-red-500/20"
+              ? "bg-red-500/10 text-red-400 border border-red-500/25 shadow-[0_0_16px_rgba(248,113,113,0.15)]"
+              : "text-gray-700 border border-transparent hover:text-red-400/60 hover:border-red-500/10"
             }`}
         >
           Sell
         </button>
       </div>
 
-      <div className="p-4 pt-0 flex flex-col gap-4">
+      <div className="p-4 pt-1 flex flex-col gap-4">
         {/* Wallet balance */}
         {isConnected && (
-          <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center justify-between text-xs text-gray-600">
             <span>Balance</span>
-            <span className="font-mono text-gray-300">
+            <span className="font-mono text-gray-400">
               {bnbBalance ? parseFloat(formatEther(bnbBalance.value)).toFixed(4) : "—"} BNB
             </span>
           </div>
         )}
 
         {/* Amount input */}
-        <div className={`rounded-xl border p-4 glass transition-all duration-200 ${
-          tab === "buy" ? "border-green-500/20 focus-within:border-green-500/40 focus-within:shadow-[0_0_14px_rgba(74,222,128,0.15)]" : "border-red-500/20 focus-within:border-red-500/40 focus-within:shadow-[0_0_14px_rgba(248,113,113,0.15)]"
-        }`}>
+        <div className={`rounded-xl border p-4 transition-all duration-300 ${
+          tab === "buy" ? "border-emerald-500/15 focus-within:border-emerald-500/30 focus-within:shadow-[0_0_14px_rgba(52,211,153,0.08)]" : "border-red-500/15 focus-within:border-red-500/30 focus-within:shadow-[0_0_14px_rgba(248,113,113,0.08)]"
+        }`} style={{ background: "rgba(255,255,255,0.015)" }}>
           <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
             <span className="font-medium">{tab === "buy" ? "You pay" : `You sell`}</span>
             <span className={`font-semibold text-xs ${
@@ -233,9 +236,9 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
               <button
                 key={p}
                 onClick={() => setAmount(p)}
-                className={`rounded-lg border py-1.5 text-xs font-semibold transition-all duration-150 ${amount === p
-                    ? "border-green-500/40 bg-green-500/10 text-green-300 shadow-[0_0_10px_rgba(74,222,128,0.2)]"
-                    : "border-bnb-yellow/10 glass text-gray-500 hover:border-green-500/20 hover:text-green-400"
+                className={`rounded-lg border py-1.5 text-xs font-semibold transition-all duration-200 ${amount === p
+                    ? "border-emerald-500/30 bg-emerald-500/[0.06] text-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.1)]"
+                    : "border-white/[0.04] bg-white/[0.015] text-gray-600 hover:border-emerald-500/15 hover:text-emerald-400/70"
                   }`}
               >
                 {p} BNB
@@ -291,10 +294,10 @@ export function BuySellPanel({ token, curveAddress, curveLoading = false }: Prop
         <button
           onClick={handleAction}
           disabled={isLoading || curveLoading || (isConnected && (!amount || bnbAmt <= 0))}
-          className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all duration-200 disabled:opacity-40 active:scale-[0.98] ${
+          className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all duration-300 disabled:opacity-30 active:scale-[0.98] ${
             tab === "buy"
-              ? "bg-gradient-to-r from-green-500 to-green-400 text-white shadow-[0_0_22px_rgba(74,222,128,0.35)] hover:shadow-[0_0_32px_rgba(74,222,128,0.55)] hover:-translate-y-0.5"
-              : "bg-gradient-to-r from-red-500 to-red-400 text-white shadow-[0_0_22px_rgba(248,113,113,0.35)] hover:shadow-[0_0_32px_rgba(248,113,113,0.55)] hover:-translate-y-0.5"
+              ? "bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-[0_2px_20px_rgba(52,211,153,0.25)] hover:shadow-[0_4px_28px_rgba(52,211,153,0.4)] hover:-translate-y-0.5"
+              : "bg-gradient-to-r from-red-500 to-red-400 text-white shadow-[0_2px_20px_rgba(248,113,113,0.25)] hover:shadow-[0_4px_28px_rgba(248,113,113,0.4)] hover:-translate-y-0.5"
             }`}
         >
           {curveLoading ? (

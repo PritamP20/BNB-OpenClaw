@@ -28,12 +28,19 @@ function CopyBtn({ text }: { text: string }) {
 
 function CodeBlock({ code, lang = "bash" }: { code: string; lang?: string }) {
   return (
-    <div className="relative rounded-xl border border-[#2a2a35] bg-[#0a0a0f] overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[#2a2a35] bg-[#111118]">
-        <span className="text-[10px] font-mono text-[#6b7280] uppercase tracking-wider">{lang}</span>
+    <div className="relative rounded-xl border border-white/[0.04] overflow-hidden" style={{ background: "rgba(6,6,10,0.8)" }}>
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.04]" style={{ background: "rgba(255,255,255,0.015)" }}>
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
+            <div className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
+            <div className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
+          </div>
+          <span className="text-[10px] font-mono text-gray-700 uppercase tracking-wider ml-2">{lang}</span>
+        </div>
         <CopyBtn text={code} />
       </div>
-      <pre className="px-4 py-4 text-sm font-mono text-[#e2e8f0] overflow-x-auto leading-relaxed whitespace-pre">{code}</pre>
+      <pre className="px-4 py-4 text-[13px] font-mono text-gray-300 overflow-x-auto leading-relaxed whitespace-pre">{code}</pre>
     </div>
   );
 }
@@ -48,18 +55,21 @@ function Section({ title, icon: Icon, children, defaultOpen = true }: {
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-[#2a2a35] rounded-2xl overflow-hidden">
+    <div className="border border-white/[0.04] rounded-2xl overflow-hidden" style={{ background: "rgba(255,255,255,0.01)" }}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-5 py-4 bg-[#111118] hover:bg-[#16161e] transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 transition-colors hover:bg-white/[0.015]"
+        style={{ background: "rgba(255,255,255,0.02)" }}
       >
         <span className="flex items-center gap-2.5 text-sm font-semibold text-white">
-          <Icon size={15} className="text-[#F3BA2F]" />
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-bnb-yellow/[0.06] border border-bnb-yellow/10">
+            <Icon size={13} className="text-[#F3BA2F]" />
+          </span>
           {title}
         </span>
-        {open ? <ChevronDown size={15} className="text-[#6b7280]" /> : <ChevronRight size={15} className="text-[#6b7280]" />}
+        {open ? <ChevronDown size={14} className="text-gray-700" /> : <ChevronRight size={14} className="text-gray-700" />}
       </button>
-      {open && <div className="px-5 py-5 space-y-5 bg-[#0e0e13]">{children}</div>}
+      {open && <div className="px-5 py-5 space-y-5" style={{ background: "rgba(6,6,10,0.4)" }}>{children}</div>}
     </div>
   );
 }
@@ -68,9 +78,9 @@ function Section({ title, icon: Icon, children, defaultOpen = true }: {
 
 function Method({ m }: { m: "POST" | "GET" }) {
   return (
-    <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
-      m === "POST" ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                   : "bg-green-500/20 text-green-300 border border-green-500/30"
+    <span className={`text-[10px] font-bold font-mono px-2.5 py-1 rounded-md ${
+      m === "POST" ? "bg-blue-500/10 text-blue-400 border border-blue-500/15"
+                   : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/15"
     }`}>
       {m}
     </span>
@@ -79,13 +89,13 @@ function Method({ m }: { m: "POST" | "GET" }) {
 
 function Param({ name, type, req, desc }: { name: string; type: string; req?: boolean; desc: string }) {
   return (
-    <div className="flex gap-4 py-2.5 border-b border-[#1e1e28] last:border-0">
+    <div className="flex gap-4 py-2.5 border-b border-white/[0.03] last:border-0">
       <div className="w-48 flex-shrink-0">
         <code className="text-xs text-[#F3BA2F] font-mono">{name}</code>
-        {req && <span className="ml-1.5 text-[9px] text-red-400 font-semibold">required</span>}
+        {req && <span className="ml-1.5 text-[9px] text-red-400/80 font-semibold">required</span>}
       </div>
-      <code className="text-[10px] text-[#6b7280] font-mono w-20 flex-shrink-0 pt-0.5">{type}</code>
-      <p className="text-xs text-[#9a9aaa]">{desc}</p>
+      <code className="text-[10px] text-gray-700 font-mono w-20 flex-shrink-0 pt-0.5">{type}</code>
+      <p className="text-xs text-gray-500">{desc}</p>
     </div>
   );
 }
@@ -193,38 +203,38 @@ console.log(await chat("Hi, what can you do?"));
 console.log(await chat("Tell me about DeFi yields"));`;
 
   return (
-    <div className="min-h-screen bg-[#08080c] text-white">
+    <div className="min-h-screen text-white" style={{ background: "#060608" }}>
       {/* Header */}
-      <div className="border-b border-[#2a2a35] bg-[#0e0e13]">
-        <div className="max-w-5xl mx-auto px-6 py-10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F3BA2F]/10 border border-[#F3BA2F]/20 flex items-center justify-center">
-              <Code2 size={18} className="text-[#F3BA2F]" />
+      <div className="border-b border-white/[0.04]" style={{ background: "rgba(255,255,255,0.01)" }}>
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-[#F3BA2F]/[0.06] border border-[#F3BA2F]/10 flex items-center justify-center shadow-[0_0_16px_rgba(243,186,47,0.08)]">
+              <Code2 size={17} className="text-[#F3BA2F]" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Developer SDK</h1>
-              <p className="text-sm text-[#6b7280]">Integrate AI agents into any app or tool</p>
+              <h1 className="text-2xl font-bold text-white tracking-[-0.02em]">Developer SDK</h1>
+              <p className="text-sm text-gray-600">Integrate AI agents into any app or tool</p>
             </div>
           </div>
-          <p className="text-sm text-[#9a9aaa] max-w-2xl mt-4">
+          <p className="text-[13px] text-gray-500 max-w-2xl mt-5 leading-relaxed">
             Every agent on OpenClaw exposes a simple REST endpoint. No SDK required — use{" "}
-            <code className="text-[#F3BA2F] bg-[#F3BA2F]/10 px-1.5 py-0.5 rounded text-xs">fetch</code>,{" "}
-            <code className="text-[#F3BA2F] bg-[#F3BA2F]/10 px-1.5 py-0.5 rounded text-xs">curl</code>, Python, or any HTTP client.
+            <code className="text-[#F3BA2F] bg-[#F3BA2F]/[0.06] px-1.5 py-0.5 rounded text-xs border border-[#F3BA2F]/10">fetch</code>,{" "}
+            <code className="text-[#F3BA2F] bg-[#F3BA2F]/[0.06] px-1.5 py-0.5 rounded text-xs border border-[#F3BA2F]/10">curl</code>, Python, or any HTTP client.
             Token-gating is verified on‑chain — holding the agent token is your API key.
           </p>
 
           {/* Quick stats */}
-          <div className="flex flex-wrap gap-3 mt-6">
+          <div className="flex flex-wrap gap-3 mt-7">
             {[
               { icon: Key,      label: "Auth",     value: "Wallet address + token balance" },
               { icon: Zap,      label: "AI",       value: "Groq Llama 3.3 70B (free tier)" },
               { icon: Globe,    label: "Base URL",  value: API_URL },
               { icon: Bot,      label: "Skills",   value: "Injected automatically" },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-center gap-2 bg-[#111118] border border-[#2a2a35] rounded-xl px-4 py-2.5">
-                <Icon size={13} className="text-[#F3BA2F]" />
-                <span className="text-[11px] text-[#6b7280]">{label}:</span>
-                <span className="text-[11px] text-white font-mono">{value}</span>
+              <div key={label} className="flex items-center gap-2 border border-white/[0.04] rounded-xl px-4 py-2.5 transition-all hover:border-white/[0.08]" style={{ background: "rgba(255,255,255,0.015)" }}>
+                <Icon size={12} className="text-[#F3BA2F]/70" />
+                <span className="text-[10px] text-gray-700">{label}:</span>
+                <span className="text-[10px] text-gray-400 font-mono">{value}</span>
               </div>
             ))}
           </div>
@@ -236,18 +246,18 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Authentication */}
         <Section title="Authentication" icon={Key}>
-          <p className="text-sm text-[#9a9aaa]">
+          <p className="text-sm text-gray-500">
             There are no API keys. Access is token-gated on‑chain. Pass your wallet address
             as <code className="text-[#F3BA2F] text-xs">userAddress</code> — the server checks
             your on‑chain balance of the agent token in real time. Hold ≥ 1 wei to get access.
           </p>
-          <div className="bg-[#111118] border border-[#F3BA2F]/20 rounded-xl p-4 text-sm">
-            <p className="text-[#F3BA2F] font-semibold text-xs mb-1">Your wallet address (auto-filled when connected)</p>
-            <code className="text-white font-mono text-xs break-all">{walletAddr}</code>
+          <div className="border border-[#F3BA2F]/10 rounded-xl p-4 text-sm" style={{ background: "rgba(243,186,47,0.02)" }}>
+            <p className="text-[#F3BA2F]/80 font-semibold text-xs mb-1">Your wallet address (auto-filled when connected)</p>
+            <code className="text-gray-300 font-mono text-xs break-all">{walletAddr}</code>
           </div>
-          <p className="text-xs text-[#6b7280]">
-            Each message costs <strong className="text-white">1 credit</strong>. Credits are calculated from your token
-            balance: <strong className="text-white">1 whole token = 200 credits</strong>.
+          <p className="text-xs text-gray-600">
+            Each message costs <strong className="text-gray-300">1 credit</strong>. Credits are calculated from your token
+            balance: <strong className="text-gray-300">1 whole token = 200 credits</strong>.
           </p>
         </Section>
 
@@ -257,14 +267,14 @@ console.log(await chat("Tell me about DeFi yields"));`;
             <Method m="POST" />
             <code className="text-sm font-mono text-white">/api/chat</code>
           </div>
-          <p className="text-sm text-[#9a9aaa]">
+          <p className="text-sm text-gray-500">
             Send a message and receive an AI reply. Skills held by the user are automatically
             injected as system context.
           </p>
 
           <div>
-            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Request body</p>
-            <div className="rounded-xl border border-[#2a2a35] overflow-hidden">
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Request body</p>
+            <div className="rounded-xl border border-white/[0.04] overflow-hidden" style={{ background: "rgba(255,255,255,0.01)" }}>
               <Param name="agentTokenAddress" type="string" req desc="ERC-20 address of the agent token (0x…)" />
               <Param name="userAddress"       type="string" req desc="Caller's wallet address — used for token-gate check" />
               <Param name="message"           type="string" req desc="The user's message" />
@@ -276,8 +286,8 @@ console.log(await chat("Tell me about DeFi yields"));`;
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Response</p>
-            <div className="rounded-xl border border-[#2a2a35] overflow-hidden">
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Response</p>
+            <div className="rounded-xl border border-white/[0.04] overflow-hidden" style={{ background: "rgba(255,255,255,0.01)" }}>
               <Param name="reply"        type="string" desc="AI-generated response text" />
               <Param name="creditCost"   type="number" desc="Credits deducted for this message (always 1)" />
               <Param name="tokensHeld"   type="string" desc="Caller's token balance in ether units" />
@@ -286,7 +296,7 @@ console.log(await chat("Tell me about DeFi yields"));`;
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Examples</p>
+            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Examples</p>
             <CodeBlock lang="bash" code={curlChat} />
             <CodeBlock lang="javascript" code={jsChat} />
             <CodeBlock lang="python" code={pythonChat} />
@@ -295,7 +305,7 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Conversational history */}
         <Section title="Multi-turn conversations" icon={BookOpen} defaultOpen={false}>
-          <p className="text-sm text-[#9a9aaa]">
+          <p className="text-sm text-gray-500">
             Pass previous messages in the <code className="text-[#F3BA2F] text-xs">history</code> array
             to maintain context across turns. The server uses the last 10 messages.
           </p>
@@ -304,7 +314,7 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Skills */}
         <Section title="Skill tokens — automatic prompt injection" icon={Zap} defaultOpen={false}>
-          <p className="text-sm text-[#9a9aaa]">
+          <p className="text-sm text-gray-500">
             Skill tokens extend agent behaviour. When a user holds a skill token linked to an agent,
             the skill's system prompt is automatically injected before every message — no extra API work needed.
           </p>
@@ -314,10 +324,10 @@ console.log(await chat("Tell me about DeFi yields"));`;
               { step: "2", title: "User buys skill",      desc: "Holds ≥ 1 wei on BSC Testnet" },
               { step: "3", title: "Prompt auto-injected", desc: "Server checks balance + injects on every /api/chat call" },
             ].map(({ step, title, desc }) => (
-              <div key={step} className="bg-[#111118] border border-[#2a2a35] rounded-xl p-4">
-                <div className="w-6 h-6 rounded-full bg-[#F3BA2F]/20 text-[#F3BA2F] text-[10px] font-bold flex items-center justify-center mb-2">{step}</div>
-                <p className="font-semibold text-white mb-1">{title}</p>
-                <p className="text-[#6b7280]">{desc}</p>
+              <div key={step} className="border border-white/[0.04] rounded-xl p-4" style={{ background: "rgba(255,255,255,0.015)" }}>
+                <div className="w-6 h-6 rounded-full bg-[#F3BA2F]/10 border border-[#F3BA2F]/15 text-[#F3BA2F] text-[10px] font-bold flex items-center justify-center mb-2">{step}</div>
+                <p className="font-semibold text-gray-200 mb-1">{title}</p>
+                <p className="text-gray-600 text-[11px]">{desc}</p>
               </div>
             ))}
           </div>
@@ -326,9 +336,9 @@ console.log(await chat("Tell me about DeFi yields"));`;
 
         {/* Claude Code / MCP */}
         <Section title="Claude Code & MCP integration" icon={Code2} defaultOpen={false}>
-          <p className="text-sm text-[#9a9aaa]">
-            Connect any OpenClaw agent to <strong className="text-white">Claude Code</strong> or{" "}
-            <strong className="text-white">Claude Desktop</strong> via the Model Context Protocol (MCP).
+          <p className="text-sm text-gray-500">
+            Connect any OpenClaw agent to <strong className="text-gray-200">Claude Code</strong> or{" "}
+            <strong className="text-gray-200">Claude Desktop</strong> via the Model Context Protocol (MCP).
             This lets you query your on-chain AI agents directly from within your IDE.
           </p>
 
@@ -346,33 +356,33 @@ console.log(await chat("Tell me about DeFi yields"));`;
             <CodeBlock lang="bash" code={mcpFetch} />
           </div>
 
-          <div className="bg-[#111118] border border-[#2a2a35] rounded-xl p-4 text-sm space-y-2">
-            <p className="text-[#F3BA2F] font-semibold text-xs">Other AI tool integrations</p>
-            <div className="grid grid-cols-2 gap-2 text-xs text-[#9a9aaa]">
-              <div>✓ <strong className="text-white">Cursor</strong> — use via HTTP request in agent mode</div>
-              <div>✓ <strong className="text-white">LangChain</strong> — wrap as a Tool using requests</div>
-              <div>✓ <strong className="text-white">n8n / Zapier</strong> — HTTP node → POST /api/chat</div>
-              <div>✓ <strong className="text-white">OpenAI Assistants</strong> — use as a function call target</div>
+          <div className="border border-white/[0.04] rounded-xl p-4 text-sm space-y-2" style={{ background: "rgba(255,255,255,0.015)" }}>
+            <p className="text-[#F3BA2F]/80 font-semibold text-xs">Other AI tool integrations</p>
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+              <div>✓ <strong className="text-gray-200">Cursor</strong> — use via HTTP request in agent mode</div>
+              <div>✓ <strong className="text-gray-200">LangChain</strong> — wrap as a Tool using requests</div>
+              <div>✓ <strong className="text-gray-200">n8n / Zapier</strong> — HTTP node → POST /api/chat</div>
+              <div>✓ <strong className="text-gray-200">OpenAI Assistants</strong> — use as a function call target</div>
             </div>
           </div>
         </Section>
 
         {/* Error codes */}
         <Section title="Error codes" icon={Terminal} defaultOpen={false}>
-          <div className="rounded-xl border border-[#2a2a35] overflow-hidden text-xs font-mono">
+          <div className="rounded-xl border border-white/[0.04] overflow-hidden text-xs font-mono" style={{ background: "rgba(255,255,255,0.01)" }}>
             {[
               { code: "400", text: "Bad request — missing or invalid fields" },
               { code: "403", text: "Token gate failed — userAddress holds 0 tokens" },
               { code: "429", text: "Rate limited by upstream AI provider" },
               { code: "500", text: "Internal server error — check API logs" },
             ].map(({ code, text }) => (
-              <div key={code} className="flex gap-4 px-4 py-3 border-b border-[#1e1e28] last:border-0">
+              <div key={code} className="flex gap-4 px-4 py-3 border-b border-white/[0.03] last:border-0">
                 <span className={`w-10 font-bold flex-shrink-0 ${
-                  code === "403" ? "text-red-400" :
-                  code === "400" ? "text-orange-400" :
-                  code === "429" ? "text-yellow-400" : "text-[#6b7280]"
+                  code === "403" ? "text-red-400/80" :
+                  code === "400" ? "text-orange-400/80" :
+                  code === "429" ? "text-yellow-400/80" : "text-gray-600"
                 }`}>{code}</span>
-                <span className="text-[#9a9aaa]">{text}</span>
+                <span className="text-gray-500">{text}</span>
               </div>
             ))}
           </div>

@@ -34,7 +34,7 @@ function PriceTooltip({ active, payload }: { active?: boolean; payload?: Array<{
   const d = payload[0]?.payload;
   if (!d) return null;
   return (
-    <div className="rounded-xl border border-bnb-yellow/10 bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
+    <div className="rounded-xl border border-white/[0.04] p-3 text-xs shadow-2xl backdrop-blur-xl" style={{ background: "rgba(10,10,14,0.95)" }}>
       <p className="mb-1.5 text-gray-500">
         {new Date(d.time).toLocaleString([], {
           month: "short", day: "numeric",
@@ -43,7 +43,7 @@ function PriceTooltip({ active, payload }: { active?: boolean; payload?: Array<{
       </p>
       <p className="font-mono text-base font-bold text-white">{fmtUSD(d.priceUSD)}</p>
       <p className="text-gray-500">{d.price.toFixed(12)} BNB</p>
-      <div className="mt-2 flex gap-3 border-t border-white/5 pt-2">
+      <div className="mt-2 flex gap-3 border-t border-white/[0.04] pt-2">
         <div>
           <p className="text-gray-600">High</p>
           <p className="font-mono text-green-400">{fmtUSD(d.high)}</p>
@@ -63,7 +63,7 @@ function VolumeTooltip({ active, payload }: { active?: boolean; payload?: Array<
   if (!d) return null;
   const total = d.buyVol + d.sellVol;
   return (
-    <div className="rounded-xl border border-bnb-yellow/10 bg-[#16161a]/95 p-3 text-xs shadow-2xl backdrop-blur">
+    <div className="rounded-xl border border-white/[0.04] p-3 text-xs shadow-2xl backdrop-blur-xl" style={{ background: "rgba(10,10,14,0.95)" }}>
       <p className="font-mono font-bold text-white">
         {fmtUSD(total, true)} vol
       </p>
@@ -153,7 +153,7 @@ export function PriceChart({ token }: { token: MockToken }) {
           </span>
         </div>
         {/* Range tabs */}
-        <div className="ml-auto flex gap-0.5 rounded-lg border border-bnb-yellow/10 bg-black/40 p-0.5">
+        <div className="ml-auto flex gap-0.5 rounded-lg border border-white/[0.04] bg-black/40 p-0.5">
           {RANGES.map((r) => (
             <button
               key={r}
@@ -182,14 +182,14 @@ export function PriceChart({ token }: { token: MockToken }) {
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#2a2a35"
+              stroke="rgba(255,255,255,0.04)"
               vertical={false}
             />
             <XAxis
               dataKey="time"
               tickFormatter={(v) => fmtAxisTime(v, range)}
               tick={{ fill: "#6b7280", fontSize: 11 }}
-              axisLine={{ stroke: "#2a2a35" }}
+              axisLine={{ stroke: "rgba(255,255,255,0.04)" }}
               tickLine={false}
               minTickGap={60}
             />

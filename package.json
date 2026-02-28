@@ -1,5 +1,5 @@
 {
-  "name": "BNB-Openclaw",
+  "name": "AgentLaunch",
   "private": true,
   "scripts": {
     "build": "turbo run build",

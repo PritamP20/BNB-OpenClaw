@@ -132,52 +132,50 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50">
-      {/* Glowing top border line */}
-      <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(243,186,47,0.5) 30%, rgba(243,186,47,0.8) 50%, rgba(243,186,47,0.5) 70%, transparent)" }} />
+      {/* Premium top accent line */}
+      <div className="h-[1px] w-full" style={{ background: "linear-gradient(90deg, transparent 5%, rgba(243,186,47,0.15) 20%, rgba(243,186,47,0.5) 35%, rgba(243,186,47,0.8) 50%, rgba(243,186,47,0.5) 65%, rgba(243,186,47,0.15) 80%, transparent 95%)" }} />
 
       <div
-        className="border-b border-bnb-yellow/10 backdrop-blur-2xl"
-        style={{ background: "rgba(8,8,12,0.88)", backdropFilter: "blur(24px) saturate(1.4)" }}
+        className="border-b border-white/[0.04]"
+        style={{ background: "rgba(6,6,8,0.82)", backdropFilter: "blur(32px) saturate(1.6)" }}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+        <div className="mx-auto flex h-[60px] max-w-7xl items-center justify-between px-5">
 
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2.5">
-            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-bnb-yellow to-bnb-yellow-dim shadow-glow-sm transition-all group-hover:shadow-glow-md">
-              {/* Scan-line shimmer on logo */}
-              <div className="absolute inset-0 overflow-hidden rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="h-full w-0.5 bg-white/30" style={{ animation: "streak 1.5s linear infinite" }} />
-              </div>
-              <Zap size={17} strokeWidth={2.5} className="relative z-10 text-black" />
+          <Link href="/" className="group flex items-center gap-3">
+            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-bnb-yellow via-[#e8a820] to-[#d4a121] shadow-[0_2px_12px_rgba(243,186,47,0.3)] transition-all duration-300 group-hover:shadow-[0_4px_20px_rgba(243,186,47,0.5)]">
+              {/* Inner shine */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl" />
+              <Zap size={16} strokeWidth={2.5} className="relative z-10 text-black" />
             </div>
             <div>
-              <span className="text-lg font-extrabold tracking-tight text-white">
+              <span className="text-[17px] font-extrabold tracking-tight text-white">
                 Agent<span className="shimmer-text">Launch</span>
               </span>
-              <div className="text-[9px] font-semibold tracking-widest text-bnb-yellow/60 uppercase -mt-0.5">
+              <div className="text-[9px] font-semibold tracking-[0.15em] text-bnb-yellow/50 uppercase -mt-0.5">
                 BNB Chain
               </div>
             </div>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden items-center gap-0.5 md:flex">
             {navLinks.map(({ href, label, icon: Icon }) => {
               const active = pathname === href;
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`relative flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
+                  className={`relative flex items-center gap-1.5 rounded-xl px-4 py-2 text-[13px] font-medium transition-all duration-200 ${
                     active
                       ? "text-bnb-yellow"
-                      : "text-gray-400 hover:text-white"
+                      : "text-gray-500 hover:text-gray-200"
                   }`}
                 >
                   {active && (
-                    <span className="absolute inset-0 rounded-xl bg-bnb-yellow/10 border border-bnb-yellow/20" />
+                    <span className="absolute inset-0 rounded-xl bg-bnb-yellow/[0.08] border border-bnb-yellow/15 shadow-[0_0_12px_rgba(243,186,47,0.06)]" />
                   )}
-                  <Icon size={15} className="relative z-10" />
+                  <Icon size={14} className="relative z-10" />
                   <span className="relative z-10">{label}</span>
                   {active && (
                     <span className="relative z-10 h-1 w-1 rounded-full bg-bnb-yellow animate-pulse-slow ml-0.5" />
@@ -190,8 +188,8 @@ export function Navbar() {
           {/* Right side */}
           <div className="flex items-center gap-3">
             {/* BNB Chain badge */}
-            <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-bnb-yellow/20 bg-bnb-yellow/5 px-3 py-1 text-[11px] font-medium text-bnb-yellow/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-bnb-yellow animate-pulse-slow" />
+            <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] px-3 py-1 text-[10px] font-medium text-gray-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-slow shadow-[0_0_4px_rgba(52,211,153,0.5)]" />
               Testnet
             </div>
 

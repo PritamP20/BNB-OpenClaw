@@ -203,10 +203,10 @@ function AgentDropdown({
         onClick={() => setOpen((o) => !o)}
         className={`flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-sm transition-colors ${
           fieldError
-            ? "border-red-500/50 bg-bnb-dark"
+            ? "border-red-500/40 bg-[#060608]"
             : open
-            ? "border-bnb-yellow/60 bg-bnb-dark"
-            : "border-bnb-yellow/10 bg-bnb-dark hover:border-white/20"
+            ? "border-white/[0.12] bg-[#060608]"
+            : "border-white/[0.06] bg-[#060608] hover:border-white/[0.08]"
         }`}
       >
         {selected ? (
@@ -234,10 +234,10 @@ function AgentDropdown({
 
       {/* Dropdown panel */}
       {open && (
-        <div className="absolute z-50 mt-1.5 w-full overflow-hidden rounded-xl border border-bnb-yellow/10 bg-[#0e0e11] shadow-2xl shadow-black/70">
+        <div className="absolute z-50 mt-1.5 w-full overflow-hidden rounded-xl border border-white/[0.06] bg-[#0a0a0e] shadow-2xl shadow-black/70">
           {/* Search bar */}
-          <div className="border-b border-bnb-yellow/10 p-2">
-            <div className="flex items-center gap-2 rounded-lg border border-bnb-yellow/10 bg-bnb-dark px-3 py-1.5">
+          <div className="border-b border-white/[0.04] p-2">
+            <div className="flex items-center gap-2 rounded-lg border border-white/[0.06] bg-[#060608] px-3 py-1.5">
               <Search size={12} className="flex-shrink-0 text-gray-600" />
               <input
                 autoFocus
@@ -341,7 +341,7 @@ function AgentDropdown({
 
           {/* Footer */}
           {!isLoading && agents.length > 0 && (
-            <div className="border-t border-bnb-yellow/10 px-3 py-1.5 text-[10px] text-gray-600">
+            <div className="border-t border-white/[0.04] px-3 py-1.5 text-[10px] text-gray-600">
               {filtered.length} of {agents.length} agent
               {agents.length !== 1 ? "s" : ""} on BNB Testnet
             </div>
@@ -434,16 +434,16 @@ function useCurveStats(form: FormState) {
 // ── Shared UI atoms ───────────────────────────────────────────────────────────
 
 const glassInputStyle = {
-  background: "rgba(18,18,26,0.9)",
-  border: "1px solid rgba(243,186,47,0.15)",
+  background: "rgba(255,255,255,0.02)",
+  border: "1px solid rgba(255,255,255,0.06)",
   backdropFilter: "blur(12px)",
 } as React.CSSProperties;
 
 const inputCls =
-  "w-full rounded-xl border border-bnb-yellow/15 bg-[rgba(18,18,26,0.9)] px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none transition-all" +
-  " focus:border-bnb-yellow/50 focus:shadow-[0_0_12px_rgba(243,186,47,0.15)]";
+  "w-full rounded-xl border border-white/[0.06] bg-[rgba(255,255,255,0.02)] px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none transition-all" +
+  " focus:border-white/[0.12] focus:bg-white/[0.03]";
 const errorInputCls =
-  "w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none transition-all border border-red-500/50 bg-[rgba(18,18,26,0.9)] focus:border-red-500 focus:shadow-[0_0_12px_rgba(248,113,113,0.15)]";
+  "w-full rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none transition-all border border-red-500/40 bg-[rgba(255,255,255,0.02)] focus:border-red-500/60";
 
 function Field({
   label, hint, error, children,
@@ -478,7 +478,7 @@ function Toggle({ checked, onChange, label, sub }: {
     <button
       type="button"
       onClick={onChange}
-      className="flex items-start gap-3 rounded-xl border border-bnb-yellow/10 bg-bnb-dark p-3 text-left transition-colors hover:border-white/20"
+      className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-[#060608] p-3 text-left transition-colors hover:border-white/10"
     >
       <div className={`relative mt-0.5 h-5 w-9 flex-shrink-0 rounded-full transition-colors ${checked ? "bg-bnb-yellow" : "bg-white/10"}`}>
         <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${checked ? "translate-x-4" : "translate-x-0.5"}`} />
@@ -493,10 +493,10 @@ function Toggle({ checked, onChange, label, sub }: {
 
 function SectionHeading({ n, label }: { n: number; label: string }) {
   return (
-    <div className="flex items-center gap-3 border-t border-bnb-yellow/10 pt-5">
-      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg border border-bnb-yellow/40 bg-bnb-yellow/10 text-[11px] font-bold text-bnb-yellow shadow-[0_0_10px_rgba(243,186,47,0.2)]">{n}</span>
-      <p className="text-xs font-semibold uppercase tracking-widest text-gray-300">{label}</p>
-      <div className="flex-1 h-px bg-gradient-to-r from-bnb-yellow/10 to-transparent" />
+    <div className="flex items-center gap-3 border-t border-white/[0.04] pt-5">
+      <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04] text-[11px] font-bold text-gray-400">{n}</span>
+      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">{label}</p>
+      <div className="flex-1 h-px bg-gradient-to-r from-white/[0.04] to-transparent" />
     </div>
   );
 }
@@ -514,10 +514,10 @@ function PreviewPanel({ form, type, curveStats, onAvatarChange }: {
   return (
     <div className="flex flex-col gap-4">
       {/* Avatar picker */}
-      <div className="overflow-hidden rounded-2xl border border-bnb-yellow/10 glass">
-        <div className="flex items-center gap-2 border-b border-bnb-yellow/10 px-4 py-3">
-          <Sparkles size={12} className="text-bnb-yellow" />
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Choose Avatar</p>
+      <div className="overflow-hidden rounded-2xl border border-white/[0.04] glass">
+        <div className="flex items-center gap-2 border-b border-white/[0.04] px-4 py-3">
+          <Sparkles size={12} className="text-gray-500" />
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">Choose Avatar</p>
         </div>
         <div className="grid grid-cols-6 gap-1.5 p-4">
           {AVATARS[type].map((emoji) => (
@@ -534,16 +534,16 @@ function PreviewPanel({ form, type, curveStats, onAvatarChange }: {
       </div>
 
       {/* Token preview card */}
-      <div className="overflow-hidden rounded-2xl border border-bnb-yellow/10 glass">
-        <div className="flex items-center gap-2 border-b border-bnb-yellow/10 px-4 py-3">
-          <div className="flex h-4 w-4 items-center justify-center rounded bg-bnb-yellow/15 border border-bnb-yellow/25">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.04] glass">
+        <div className="flex items-center gap-2 border-b border-white/[0.04] px-4 py-3">
+          <div className="flex h-4 w-4 items-center justify-center rounded bg-white/[0.06] border border-white/[0.06]">
             <TypeIcon size={9} className={cfg.color} />
           </div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Preview</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">Preview</p>
         </div>
         <div className="p-4">
           {/* Token card mock */}
-          <div className="overflow-hidden rounded-xl border border-bnb-yellow/10 bg-bnb-dark">
+          <div className="overflow-hidden rounded-xl border border-white/[0.04] bg-[#060608]">
             {/* mini accent bar */}
             <div className={`h-0.5 w-full bg-gradient-to-r ${cfg.gradient} to-transparent`} />
             <div className="p-4">
@@ -583,7 +583,7 @@ function PreviewPanel({ form, type, curveStats, onAvatarChange }: {
       </div>
 
       {type === "agent" && curveStats && (
-        <div className="rounded-2xl border border-bnb-yellow/10 glass p-4">
+        <div className="rounded-2xl border border-white/[0.04] glass p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">Curve Stats</p>
           <div className="flex flex-col gap-2">
             {[
@@ -603,10 +603,10 @@ function PreviewPanel({ form, type, curveStats, onAvatarChange }: {
       )}
 
       {/* What happens next */}
-      <div className="overflow-hidden rounded-2xl border border-bnb-yellow/10 glass">
-        <div className="flex items-center gap-2 border-b border-bnb-yellow/10 px-4 py-3">
-          <Shield size={12} className="text-bnb-yellow" />
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">What Happens Next</p>
+      <div className="overflow-hidden rounded-2xl border border-white/[0.04] glass">
+        <div className="flex items-center gap-2 border-b border-white/[0.04] px-4 py-3">
+          <Shield size={12} className="text-gray-500" />
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">What Happens Next</p>
         </div>
         <ol className="flex flex-col gap-0 p-2">
           {(type === "agent" ? [
@@ -686,7 +686,7 @@ function DeployingScreen({
         {!failed && (
           <>
             <div className="absolute inset-0 rounded-full border border-bnb-yellow/20 animate-ping" />
-            <div className="absolute inset-2 rounded-full border border-bnb-yellow/10" />
+            <div className="absolute inset-2 rounded-full border border-white/[0.06]" />
           </>
         )}
         <div className={`relative flex h-16 w-16 items-center justify-center rounded-full border ${
@@ -722,7 +722,7 @@ function DeployingScreen({
                 ? "border-green-500/20 bg-green-500/5 text-green-400"
                 : active
                 ? "border-bnb-yellow/30 bg-bnb-yellow/5 text-bnb-yellow"
-                : "border-bnb-yellow/10 bg-bnb-dark text-gray-600"
+                : "border-white/[0.04] bg-[#060608] text-gray-600"
             }`}>
               {done || current
                 ? <CheckCircle2 size={15} />
@@ -738,7 +738,7 @@ function DeployingScreen({
 
       {/* Build log */}
       {buildLogs.length > 0 && (
-        <div className="rounded-xl border border-bnb-yellow/10 bg-black/60 p-3 text-left">
+        <div className="rounded-xl border border-white/[0.04] bg-black/60 p-3 text-left">
           <div className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-600">
             <Terminal size={11} /> Build Log
           </div>
@@ -760,7 +760,7 @@ function DeployingScreen({
       {failed && (
         <button
           onClick={onRetry}
-          className="mt-6 flex items-center gap-2 mx-auto rounded-xl border border-bnb-yellow/10 px-6 py-2.5 text-sm font-medium text-gray-400 hover:border-white/30 hover:text-white transition-colors"
+          className="mt-6 flex items-center gap-2 mx-auto rounded-xl border border-white/[0.06] px-6 py-2.5 text-sm font-medium text-gray-400 hover:border-white/10 hover:text-white transition-colors"
         >
           <RefreshCw size={14} /> Try Again
         </button>
@@ -807,9 +807,9 @@ function SuccessScreen({
       </p>
 
       {/* Details card */}
-      <div className="overflow-hidden rounded-2xl border border-bnb-yellow/10 glass mb-6 text-left">
-        <div className="h-0.5 w-full bg-gradient-to-r from-green-500/60 to-transparent" />
-        <div className="flex flex-col gap-0 divide-y divide-bnb-yellow/5">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.04] glass mb-6 text-left">
+        <div className="h-0.5 w-full bg-gradient-to-r from-emerald-500/60 to-transparent" />
+        <div className="flex flex-col gap-0 divide-y divide-white/[0.04]">
           {agentEndpoint && (
             <div className="flex items-start justify-between gap-3 px-5 py-3">
               <span className="text-xs text-gray-500 mt-0.5 flex-shrink-0">Agent Endpoint</span>
@@ -895,7 +895,7 @@ function SuccessScreen({
         </a>
         <button
           onClick={onReset}
-          className="rounded-xl border border-bnb-yellow/10 py-3 text-sm font-medium text-gray-500 hover:border-white/20 hover:text-white transition-colors"
+          className="rounded-xl border border-white/[0.04] py-3 text-sm font-medium text-gray-500 hover:border-white/10 hover:text-white transition-colors"
         >
           Launch Another
         </button>
@@ -1169,7 +1169,7 @@ export function LaunchForm() {
                 className={`group relative overflow-hidden flex flex-col gap-3 rounded-2xl border p-5 text-left transition-all duration-200 ${
                   active
                     ? `${cfg.activeBg} ${cfg.border} ${cfg.glow}`
-                    : "border-bnb-yellow/10 glass hover:border-white/15 hover:bg-white/[0.02]"
+                    : "border-white/[0.04] glass hover:border-white/[0.06] hover:bg-white/[0.02]"
                 }`}
               >
                 {/* Gradient accent bar at top */}
@@ -1222,7 +1222,7 @@ export function LaunchForm() {
       {/* Two-column layout */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         {/* ── LEFT: Form ─────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-5 rounded-2xl border border-bnb-yellow/10 glass p-6">
+        <div className="flex flex-col gap-5 rounded-2xl border border-white/[0.04] glass p-6">
 
           {/* Section 1 — Basic Info */}
           <SectionHeading n={1} label="Basic Info" />
@@ -1381,7 +1381,7 @@ export function LaunchForm() {
                 error={errors.runEnvsJson}
               >
                 <textarea
-                  className={`${errors.runEnvsJson ? "border-red-500/50" : "border-bnb-yellow/10 focus:border-bnb-yellow/60"} w-full rounded-xl border bg-black/50 px-4 py-3 font-mono text-xs text-gray-300 placeholder-gray-700 outline-none transition-colors`}
+                  className={`${errors.runEnvsJson ? "border-red-500/40" : "border-white/[0.06] focus:border-white/[0.12]"} w-full rounded-xl border bg-[rgba(255,255,255,0.02)] px-4 py-3 font-mono text-xs text-gray-300 placeholder-gray-700 outline-none transition-colors`}
                   placeholder={'{\n  "OPENAI_API_KEY": "sk-...",\n  "MODEL": "gpt-4o"\n}'}
                   value={form.runEnvsJson}
                   rows={4}
@@ -1467,7 +1467,7 @@ export function LaunchForm() {
                       set("agentId", "");
                       setSelectedAgent(null);
                     }}
-                    className="flex-shrink-0 rounded-lg border border-bnb-yellow/10 p-1.5 text-gray-600 hover:border-white/20 hover:text-white transition-colors"
+                    className="flex-shrink-0 rounded-lg border border-white/[0.06] p-1.5 text-gray-600 hover:border-white/[0.1] hover:text-white transition-colors"
                     title="Clear selection"
                   >
                     <X size={12} />
@@ -1480,7 +1480,7 @@ export function LaunchForm() {
                 className={`relative rounded-xl border-2 border-dashed transition-colors ${
                   skillSpecFile
                     ? "border-green-500/40 bg-green-500/5"
-                    : "border-bnb-yellow/10 hover:border-bnb-yellow/40 bg-black/20"
+                    : "border-white/[0.06] hover:border-white/[0.1] bg-black/20"
                 }`}
                 onDragOver={(e) => { e.preventDefault(); }}
                 onDrop={(e) => {
@@ -1514,14 +1514,14 @@ export function LaunchForm() {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setSkillSpecFile(null); setSkillSpecError(""); }}
-                      className="flex-shrink-0 rounded-lg border border-bnb-yellow/10 p-1.5 text-gray-600 hover:text-white transition-colors"
+                      className="flex-shrink-0 rounded-lg border border-white/[0.06] p-1.5 text-gray-600 hover:text-white transition-colors"
                     >
                       <X size={11} />
                     </button>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-2 py-6 text-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-bnb-yellow/10 bg-bnb-dark">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.06] bg-[#060608]">
                       <Upload size={16} className="text-gray-500" />
                     </div>
                     <div>
@@ -1535,7 +1535,7 @@ export function LaunchForm() {
                     <button
                       type="button"
                       onClick={() => skillFileRef.current?.click()}
-                      className="mt-1 flex items-center gap-1.5 rounded-lg border border-bnb-yellow/10 glass px-3 py-1.5 text-xs text-gray-400 hover:border-white/20 hover:text-white transition-colors"
+                      className="mt-1 flex items-center gap-1.5 rounded-lg border border-white/[0.06] glass px-3 py-1.5 text-xs text-gray-400 hover:border-white/[0.1] hover:text-white transition-colors"
                     >
                       <FileText size={11} /> Browse files
                     </button>
@@ -1548,7 +1548,7 @@ export function LaunchForm() {
 
               {/* No agents yet CTA */}
               {!agentsLoading && agentTokens.length === 0 && (
-                <div className="flex items-center gap-2 rounded-xl border border-bnb-yellow/10 bg-bnb-yellow/5 px-4 py-3 text-xs text-bnb-yellow/70">
+                <div className="flex items-center gap-2 rounded-xl border border-white/[0.04] bg-bnb-yellow/5 px-4 py-3 text-xs text-bnb-yellow/70">
                   <AlertCircle size={12} className="flex-shrink-0" />
                   No agents deployed yet.{" "}
                   <button
@@ -1599,7 +1599,7 @@ export function LaunchForm() {
           )}
 
           {/* Launch fee */}
-          <div className="flex items-center justify-between rounded-xl bg-bnb-yellow/5 border border-bnb-yellow/10 px-4 py-3 text-sm">
+          <div className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/[0.04] px-4 py-3 text-sm">
             <div className="flex items-center gap-2 text-gray-400">
               <Coins size={14} className="text-bnb-yellow" /> Launch fee
             </div>

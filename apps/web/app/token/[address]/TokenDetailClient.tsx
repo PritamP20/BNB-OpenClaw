@@ -93,7 +93,7 @@ function CopyButton({ text }: { text: string }) {
 
 function StatPill({ label, value, accent, icon }: { label: string; value: string; accent?: string; icon?: React.ReactNode }) {
   return (
-    <div className="group flex flex-col items-center rounded-xl border border-bnb-yellow/10 glass px-4 py-3 text-center transition-all duration-200 hover:border-bnb-yellow/25 hover:shadow-[0_0_16px_rgba(243,186,47,0.1)]">
+    <div className="group flex flex-col items-center rounded-xl border border-white/[0.04] glass px-4 py-3 text-center transition-all duration-200 hover:border-white/[0.08] ">
       <div className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-widest text-gray-600 group-hover:text-gray-500 transition-colors">
         {icon && <span className="opacity-60">{icon}</span>}
         {label}
@@ -133,7 +133,7 @@ function BondingCurveBar({
       : "from-blue-500 to-bnb-yellow";
 
   return (
-    <div className="rounded-2xl border border-bnb-yellow/10 glass p-5">
+    <div className="rounded-2xl border border-white/[0.04] glass p-5">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white">Bonding Curve Progress</h3>
         <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${token.isGraduated
@@ -180,15 +180,15 @@ function BondingCurveBar({
 
       {/* Stats row */}
       <div className="mt-4 grid grid-cols-3 gap-3 text-xs">
-        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
+        <div className="rounded-lg glass border border-white/[0.04] p-2.5 text-center hover:border-white/[0.08] transition-colors">
           <p className="text-gray-600">BNB Raised</p>
           <p className="font-mono font-bold text-bnb-yellow mt-0.5">{bnbRaised} BNB</p>
         </div>
-        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
+        <div className="rounded-lg glass border border-white/[0.04] p-2.5 text-center hover:border-white/[0.08] transition-colors">
           <p className="text-gray-600">Target</p>
           <p className="font-mono font-bold text-white mt-0.5">69 BNB</p>
         </div>
-        <div className="rounded-lg glass border border-bnb-yellow/10 p-2.5 text-center hover:border-bnb-yellow/25 transition-colors">
+        <div className="rounded-lg glass border border-white/[0.04] p-2.5 text-center hover:border-white/[0.08] transition-colors">
           <p className="text-gray-600">Remaining</p>
           <p className="font-mono font-bold text-bnb-yellow mt-0.5">
             {(69 - parseFloat(bnbRaised)).toFixed(2)} BNB
@@ -219,9 +219,9 @@ function TradeHistory({ token, totalSupply }: { token: Token; totalSupply?: stri
   const cfg = TYPE_CONFIG[token.type];
 
   return (
-    <div className="rounded-2xl border border-bnb-yellow/10 glass">
+    <div className="rounded-2xl border border-white/[0.04] glass">
       {/* Tab bar */}
-      <div className="flex items-center gap-0.5 border-b border-bnb-yellow/10 p-2">
+      <div className="flex items-center gap-0.5 border-b border-white/[0.04] p-2">
         <button
           onClick={() => setTab("trades")}
           className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-150 ${
@@ -688,7 +688,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
               {isUp ? "+" : ""}{livePriceChange24h.toFixed(2)}% (24h)
             </div>
             {!isGraduated && (
-              <div className="mt-2 flex items-center gap-1.5 rounded-xl bg-bnb-yellow/5 border border-bnb-yellow/15 px-3 py-1.5">
+              <div className="mt-2 flex items-center gap-1.5 rounded-xl bg-bnb-yellow/5 border border-white/[0.06] px-3 py-1.5">
                 <Flame size={10} className="text-bnb-yellow/60" />
                 <span className="text-[10px] text-bnb-yellow/70 font-medium">{finalProgress}% to graduation</span>
               </div>
@@ -731,7 +731,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
         {/* ── Left: chart + curve + trades ──────────────────────────────────── */}
         <div className="flex flex-col gap-5">
           {/* Price chart card */}
-          <div className="rounded-2xl border border-bnb-yellow/10 glass p-5">
+          <div className="rounded-2xl border border-white/[0.04] glass p-5">
             <div className="mb-3 flex items-center gap-2">
               <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-bnb-yellow/10 border border-bnb-yellow/20">
                 <Activity size={12} className="text-bnb-yellow" />
@@ -769,7 +769,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
           <BuySellPanel token={liveToken} curveAddress={curveAddress} curveLoading={curveLoading} />
 
           {/* Mini token info card */}
-          <div className="rounded-2xl border border-bnb-yellow/10 glass p-4 flex flex-col gap-2.5 text-xs">
+          <div className="rounded-2xl border border-white/[0.04] glass p-4 flex flex-col gap-2.5 text-xs">
             <h4 className="flex items-center gap-1.5 text-sm font-semibold text-white">
               <span className="h-1 w-4 rounded-full bg-bnb-yellow/60" /> Details
             </h4>
@@ -812,7 +812,7 @@ export function TokenDetailClient({ token }: { token: Token }) {
               </span>
             </div>
             {!isGraduated && (
-              <div className="mt-1 rounded-xl bg-bnb-yellow/5 border border-bnb-yellow/10 px-3 py-2">
+              <div className="mt-1 rounded-xl bg-bnb-yellow/5 border border-white/[0.04] px-3 py-2">
                 <p className="text-[10px] text-bnb-yellow/70">
                   <Flame size={10} className="inline mr-1" />
                   {finalProgress}% to graduation · {69 - (finalProgress / 100) * 69 < 1

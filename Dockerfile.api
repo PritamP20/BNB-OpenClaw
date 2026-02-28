@@ -1,0 +1,45 @@
+# syntax=docker/dockerfile:1
+# ─── Stage 1: Build API (TypeScript → JS) ────────────────────────────────────
+FROM node:20-alpine AS builder
+WORKDIR /repo
+
+COPY package.json package-lock.json turbo.json ./
+COPY apps/api/package.json                      ./apps/api/
+COPY packages/typescript-config/package.json    ./packages/typescript-config/
+COPY packages/eslint-config/package.json        ./packages/eslint-config/
+RUN npm ci --ignore-scripts
+
+COPY apps/api/                   ./apps/api/
+COPY packages/typescript-config/ ./packages/typescript-config/
+
+WORKDIR /repo/apps/api
+RUN npx tsc
+RUN cp src/db/schema.sql dist/db/schema.sql
+
+# ─── Stage 2: Runtime (non-root, user 65535 — required by NodeOps) ───────────
+FROM node:20-alpine
+WORKDIR /app
+
+# Re-install only production deps
+COPY package.json package-lock.json ./
+COPY apps/api/package.json                   ./apps/api/
+COPY packages/typescript-config/package.json ./packages/typescript-config/
+COPY packages/eslint-config/package.json     ./packages/eslint-config/
+RUN npm ci --omit=dev --ignore-scripts
+
+COPY --from=builder /repo/apps/api/dist ./api/dist
+
+# NodeOps runs containers as user 65535 (non-root)
+RUN chown -R 65535:65535 /app
+USER 65535
+
+ENV NODE_ENV=production \
+    PORT=4000 \
+    BNB_RPC_URL=https://bsc-testnet-dataseed.bnbchain.org \
+    CREATEOS_API_URL=https://api-createos.nodeops.network/v1 \
+    CREATEOS_API_KEY="" \
+    TOKEN_GATE_THRESHOLD=1000000000000000000 \
+    SIGNATURE_TTL_SECONDS=300
+
+EXPOSE 4000
+CMD ["node", "api/dist/index.js"]

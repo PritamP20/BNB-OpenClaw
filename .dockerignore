@@ -1,0 +1,13 @@
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/.git
+**/.env
+**/*.log
+**/coverage
+**/packages/contracts/artifacts
+**/packages/contracts/cache
+**/packages/contracts/typechain-types
+README.md
+docs/
