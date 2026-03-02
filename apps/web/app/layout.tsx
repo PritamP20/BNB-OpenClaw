@@ -30,7 +30,9 @@ export default function RootLayout({
       >
         <Providers>
           <Navbar />
-          <main>{children}</main>
+          <main>
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

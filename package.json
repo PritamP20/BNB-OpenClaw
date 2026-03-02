@@ -20,5 +20,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.10"
+  }
 }

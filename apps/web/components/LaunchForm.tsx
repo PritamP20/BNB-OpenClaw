@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAccount, useConnect, useChainId, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { bscTestnet } from "wagmi/chains";
 import { parseEther } from "viem";
 import { useTokenDeploy } from "../hooks/useTokenDeploy";
+import { variants } from "../lib/animations";
 import {
   Bot,
   Coins,

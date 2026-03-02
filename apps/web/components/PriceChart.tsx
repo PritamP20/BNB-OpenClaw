@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Loader2, TrendingUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -24,6 +25,7 @@ import {
   type TimeRange,
 } from "../lib/chart-data";
 import { useChartData, buildChartPoints } from "../hooks/useChartData";
+import { variants } from "../lib/animations";
 
 const RANGES: TimeRange[] = ["1H", "6H", "24H", "7D", "ALL"];
 
@@ -106,45 +108,122 @@ export function PriceChart({ token }: { token: MockToken }) {
   // ── Loading state ──────────────────────────────────────────────────────────
   if (tokenAddress && loading && !fetched) {
     return (
-      <div className="flex h-80 items-center justify-center gap-3" style={{ color: "#555555" }}>
-        <Loader2 className="h-5 w-5 animate-spin" style={{ color: "#F5C220" }} />
-        <span className="text-sm font-bold uppercase tracking-wider">Loading price data…</span>
-      </div>
+      <motion.div
+        variants={variants.slideUp}
+        initial="hidden"
+        animate="visible"
+        className="flex h-80 items-center justify-center gap-3"
+        style={{ color: "#555555" }}
+      >
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <Loader2 className="h-5 w-5" style={{ color: "#F5C220" }} />
+        </motion.div>
+        <motion.span
+          className="text-sm font-bold uppercase tracking-wider"
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          Loading price data…
+        </motion.span>
+      </motion.div>
     );
   }
 
   // ── Empty state (token on-chain, curve found, but no trades yet) ───────────
   if (tokenAddress && fetched && curveFound && data.length === 0) {
     return (
-      <div
+      <motion.div
+        variants={variants.slideUp}
+        initial="hidden"
+        animate="visible"
         className="flex h-80 flex-col items-center justify-center gap-3 text-center"
         style={{ border: "1px solid #333333" }}
       >
-        <TrendingUp className="h-8 w-8" style={{ color: "#333333" }} />
-        <p className="text-sm font-black uppercase tracking-wider" style={{ color: "#888888" }}>No trades yet</p>
-        <p className="max-w-xs text-xs font-bold uppercase tracking-wider" style={{ color: "#444444" }}>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        >
+          <TrendingUp className="h-8 w-8" style={{ color: "#333333" }} />
+        </motion.div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-sm font-black uppercase tracking-wider"
+          style={{ color: "#888888" }}
+        >
+          No trades yet
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="max-w-xs text-xs font-bold uppercase tracking-wider"
+          style={{ color: "#444444" }}
+        >
           Be the first to buy — price history will appear here once trading starts.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-0">
+    <motion.div
+      variants={variants.slideUp}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col gap-0"
+    >
       {/* Current price + stats row */}
-      <div className="mb-4 flex flex-wrap items-end gap-4">
-        <div>
-          <p className="text-3xl font-black tracking-tight" style={{ color: "#F5F5F5" }}>
+      <motion.div
+        className="mb-4 flex flex-wrap items-end gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
+        <motion.div
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+        >
+          <motion.p
+            className="text-3xl font-black tracking-tight"
+            style={{ color: "#F5F5F5" }}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             {fmtUSD(currentPrice)}
-          </p>
-          <p className="mt-0.5 font-mono text-xs" style={{ color: "#555555" }}>
+          </motion.p>
+          <motion.p
+            className="mt-0.5 font-mono text-xs"
+            style={{ color: "#555555" }}
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+          >
             {token.price.toFixed(12)} BNB
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-4 pb-0.5 text-sm">
-          <span className="font-bold" style={{ color: isUp ? "#4ade80" : "#D62828" }}>
+          </motion.p>
+        </motion.div>
+        <motion.div
+          className="flex flex-wrap gap-4 pb-0.5 text-sm"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <motion.span
+            className="font-bold"
+            style={{ color: isUp ? "#4ade80" : "#D62828" }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          >
             {isUp ? "▲" : "▼"} {Math.abs(stats.priceChange).toFixed(2)}%
-          </span>
+          </motion.span>
           <span style={{ color: "#555555" }}>
             H <span style={{ color: "#F5F5F5" }}>{fmtUSD(stats.high)}</span>
           </span>
@@ -154,28 +233,47 @@ export function PriceChart({ token }: { token: MockToken }) {
           <span style={{ color: "#555555" }}>
             Vol <span style={{ color: "#F5F5F5" }}>{fmtUSD(stats.volumeUSD, true)}</span>
           </span>
-        </div>
+        </motion.div>
         {/* Range tabs */}
-        <div className="ml-auto flex" style={{ border: "1px solid #333333" }}>
-          {RANGES.map((r) => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className="px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-colors"
-              style={{
-                background: range === r ? "#F5C220" : "#1A1A1A",
-                color: range === r ? "#0F0F0F" : "#555555",
-                borderRight: "1px solid #333333",
-              }}
-            >
-              {r}
-            </button>
-          ))}
-        </div>
-      </div>
+        <motion.div
+          className="ml-auto flex"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+          style={{ border: "1px solid #333333" }}
+        >
+          <AnimatePresence mode="wait">
+            {RANGES.map((r, idx) => (
+              <motion.button
+                key={r}
+                onClick={() => setRange(r)}
+                className="px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-colors"
+                style={{
+                  background: range === r ? "#F5C220" : "#1A1A1A",
+                  color: range === r ? "#0F0F0F" : "#555555",
+                  borderRight: idx < RANGES.length - 1 ? "1px solid #333333" : "none",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + idx * 0.05 }}
+              >
+                {r}
+              </motion.button>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
 
       {/* Price chart */}
-      <div className="h-48 w-full select-none md:h-64">
+      <motion.div
+        className="h-48 w-full select-none md:h-64"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        key={`price-${range}`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} syncId="tokenChart" margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
             <defs>
@@ -224,10 +322,16 @@ export function PriceChart({ token }: { token: MockToken }) {
             />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
+      </motion.div>
 
       {/* Volume chart */}
-      <div className="mt-1 h-16 w-full select-none">
+      <motion.div
+        className="mt-1 h-16 w-full select-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        key={`volume-${range}`}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} syncId="tokenChart" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
             <XAxis dataKey="time" hide />
@@ -237,17 +341,28 @@ export function PriceChart({ token }: { token: MockToken }) {
             <Bar dataKey="sellVol" stackId="vol" fill="#ef4444" fillOpacity={0.6} radius={[0,0,0,0]} maxBarSize={8} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </motion.div>
 
       {/* Volume label */}
-      <div className="mt-1 flex items-center gap-3 text-[11px] text-gray-600">
-        <span className="flex items-center gap-1">
+      <motion.div
+        className="mt-1 flex items-center gap-3 text-[11px] text-gray-600"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        <motion.span
+          className="flex items-center gap-1"
+          whileHover={{ scale: 1.1 }}
+        >
           <span className="inline-block h-2 w-2 rounded-sm bg-green-500/60" /> Buy vol
-        </span>
-        <span className="flex items-center gap-1">
+        </motion.span>
+        <motion.span
+          className="flex items-center gap-1"
+          whileHover={{ scale: 1.1 }}
+        >
           <span className="inline-block h-2 w-2 rounded-sm bg-red-500/60" /> Sell vol
-        </span>
-      </div>
-    </div>
+        </motion.span>
+      </motion.div>
+    </motion.div>
   );
 }

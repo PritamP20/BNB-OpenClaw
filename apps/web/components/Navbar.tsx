@@ -2,25 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  useAccount,
-  useConnect,
-  useDisconnect,
-  useChainId,
-  useSwitchChain,
-} from "wagmi";
-
-declare global {
-  interface Window { ethereum?: unknown }
-}
-import { injected } from "wagmi/connectors";
+import { useChainId } from "wagmi";
 import { bscTestnet } from "wagmi/chains";
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import {
   Zap, Rocket, BarChart2, Menu, X,
-  AlertTriangle, Loader2, ChevronDown, MessageSquare,
-  Wallet, Code2,
+  MessageSquare, Code2,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const navLinks = [
   { href: "/",       label: "Explore", icon: BarChart2     },
@@ -30,109 +19,9 @@ const navLinks = [
 ];
 
 export function Navbar() {
-  const pathname   = usePathname();
-  const { address, isConnected } = useAccount();
-  const { connect, isPending, error: connectError, reset } = useConnect();
-  const { disconnect }  = useDisconnect();
-  const chainId         = useChainId();
-  const { switchChain, isPending: isSwitching } = useSwitchChain();
-
-  const [mobileOpen,   setMobileOpen]   = useState(false);
-  const [hasInjected,  setHasInjected]  = useState<boolean | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  useEffect(() => {
-    setHasInjected(typeof window !== "undefined" && !!window.ethereum);
-  }, []);
-
-  const isWrongChain = isConnected && chainId !== bscTestnet.id;
-  const shortAddr    = address
-    ? `${address.slice(0, 6)}…${address.slice(-4)}`
-    : null;
-
-  function handleConnect() {
-    if (connectError) reset();
-    connect({ connector: injected() });
-  }
-
-  let walletBtn: React.ReactNode;
-
-  if (isConnected && isWrongChain) {
-    walletBtn = (
-      <button
-        onClick={() => switchChain({ chainId: bscTestnet.id })}
-        disabled={isSwitching}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider disabled:opacity-60"
-        style={{ background: "transparent", border: "2px solid #D62828", color: "#D62828" }}
-      >
-        {isSwitching ? <Loader2 size={13} className="animate-spin" /> : <AlertTriangle size={13} />}
-        {isSwitching ? "Switching…" : "Wrong Network"}
-      </button>
-    );
-  } else if (isConnected) {
-    walletBtn = (
-      <div className="relative">
-        <button
-          onClick={() => setShowDropdown((o) => !o)}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider"
-          style={{ background: "#1A1A1A", border: "2px solid #F5C220", color: "#F5C220" }}
-        >
-          <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#4ade80" }} />
-          {shortAddr}
-          <ChevronDown size={12} className={`transition-transform ${showDropdown ? "rotate-180" : ""}`} />
-        </button>
-        {showDropdown && (
-          <>
-            <div className="fixed inset-0 z-10" onClick={() => setShowDropdown(false)} />
-            <div
-              className="absolute right-0 top-full z-20 mt-1 w-48 p-1"
-              style={{ background: "#1A1A1A", border: "1px solid #333333" }}
-            >
-              <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#555555", borderBottom: "1px solid #333333" }}>
-                BSC Testnet
-              </div>
-              <button
-                onClick={() => { disconnect(); setShowDropdown(false); }}
-                className="mt-1 w-full px-3 py-2 text-left text-sm font-bold uppercase tracking-wider transition-colors"
-                style={{ color: "#D62828" }}
-                onMouseEnter={e => (e.currentTarget.style.background = "rgba(214,40,40,0.08)")}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-              >
-                Disconnect
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-    );
-  } else if (isPending) {
-    walletBtn = (
-      <button disabled className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider" style={{ background: "#F5C220", color: "#0F0F0F", opacity: 0.7 }}>
-        <Loader2 size={14} className="animate-spin" /> Connecting…
-      </button>
-    );
-  } else if (hasInjected === false) {
-    walletBtn = (
-      <a
-        href="https://metamask.io/download/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn-outline-neon flex items-center gap-2 px-4 py-2 text-sm"
-      >
-        <Wallet size={14} /> Install MetaMask
-      </a>
-    );
-  } else {
-    walletBtn = (
-      <button
-        onClick={handleConnect}
-        className="btn-neon flex items-center gap-2 px-5 py-2 text-sm"
-      >
-        <Wallet size={14} />
-        Connect Wallet
-      </button>
-    );
-  }
+  const pathname = usePathname();
+  const chainId = useChainId();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50" style={{ background: "#0F0F0F", borderBottom: "2px solid #222222" }}>
@@ -140,7 +29,6 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          {/* Bauhaus geometric logo mark */}
           <div
             className="flex h-8 w-8 items-center justify-center"
             style={{ background: "#F5C220" }}
@@ -190,7 +78,8 @@ export function Navbar() {
             Testnet
           </div>
 
-          {walletBtn}
+          {/* RainbowKit Connect Button */}
+          <ConnectButton />
 
           <button
             className="p-2 transition-colors md:hidden"
@@ -202,18 +91,6 @@ export function Navbar() {
           </button>
         </div>
       </div>
-
-      {/* Error banner */}
-      {connectError && !isConnected && !isPending && (
-        <div
-          className="px-4 py-2 text-center text-xs font-bold uppercase tracking-wider"
-          style={{ background: "rgba(214,40,40,0.12)", borderTop: "1px solid rgba(214,40,40,0.3)", color: "#D62828" }}
-        >
-          {connectError.message.includes("rejected") || connectError.message.includes("denied")
-            ? "Connection cancelled."
-            : `Could not connect: ${connectError.message}`}
-        </div>
-      )}
 
       {/* Mobile menu */}
       {mobileOpen && (

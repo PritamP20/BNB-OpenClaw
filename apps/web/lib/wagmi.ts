@@ -1,10 +1,12 @@
 import { createConfig, http } from "wagmi";
 import { bsc, bscTestnet } from "wagmi/chains";
-import { injected } from "wagmi/connectors";
+import { metaMask } from "wagmi/connectors";
 
 export const wagmiConfig = createConfig({
   chains: [bscTestnet, bsc],
-  connectors: [injected()],
+  connectors: [
+    metaMask(),
+  ],
   transports: {
     [bscTestnet.id]: http("https://bsc-testnet-rpc.publicnode.com"),
     [bsc.id]: http("https://bsc-dataseed.binance.org"),

@@ -1,318 +1,244 @@
-# 🟡 AgentLaunch
-
-### Intelligent Token & AI Agent Launchpad on BNB Chain
-
-> Pump.fun simplicity.
-> BNB Chain power.
-> AI-native infrastructure.
 
 ---
 
-## 🚀 Overview
+# AgentLaunch
 
-**AgentLaunch** is a next-generation launchpad built on BNB Chain that enables:
+### Tokenized AI Agents with Verifiable On-Chain Identity on BNB Chain
 
-* Launching **normal fungible tokens**
-* Launching **AI Agents as Non-Fungible Agents (NFAs)**
-* Creating **Agent-specific tokens**
-* Creating **Skill sub-tokens for AI agents**
-* Progressive Liquidity Unlock (PLU)
-* Automated Market Making customization
-* Built-in post-launch growth tools
+AgentLaunch is an infrastructure layer for launching **AI-backed tokens** on BNB Smart Chain, where every token is verifiably tied to a deployed AI agent and governed by programmable, modular incentives.
 
-The platform combines viral simplicity (like pump.fun) with intelligent on-chain infrastructure.
+Instead of launching speculative tokens, builders launch **tokenized AI economies** with structured liquidity, on-chain identity, and token-gated utility.
 
 ---
 
-## 🎯 Core Vision
+# 🌐 Live Deployment
 
-AgentLaunch introduces a modular AI token economy:
+Production App:
+[https://production-bnb-openclaw.tyzo.nodeops.app/](https://production-bnb-openclaw.tyzo.nodeops.app/)
 
-1. Developers can launch AI agents.
-2. Each AI agent has a unique NFA identity.
-3. Each agent can launch its own fungible token.
-4. Other developers can create skill tokens.
-5. Users can buy skill tokens and integrate them with agents.
-6. Liquidity unlocks progressively.
-7. Growth tools drive long-term sustainability.
+Network: **BNB Smart Chain Testnet**
 
-This creates a composable AI economy on BNB Chain.
+Smart contract addresses are listed in `bsc.address`.
 
 ---
 
-# 🧠 Architecture
+# 🚀 What It Does
 
-## 🔹 Layer 1 — Identity Layer (NFA)
+AgentLaunch enables users to:
 
-Each AI agent is minted as a **Non-Fungible Agent (NFA)**.
+* Deploy an ERC20 token on BNB Smart Chain
+* Register an AI agent on-chain
+* Provision a VM via NodeOps
+* Deploy an AI container using Docker
+* Generate a public API endpoint
+* Enforce token-gated AI access
+* Enable modular AI skill extensions
 
-NFA provides:
-
-* Unique identity
-* Upgradeable logic
-* Optional learning module
-* Vault + permission system
-* Secure state management
-
-Agents are programmable NFTs with intelligence capabilities.
+Each launched token is directly linked to a functional AI agent.
 
 ---
 
-## 🔹 Layer 2 — Economic Layer (Fungible Tokens)
+# 🧠 Why It Matters
 
-Each agent can launch:
+Current launchpads suffer from:
 
-* Agent Token (primary token)
-* Skill Tokens (sub-modular tokens)
+* Instant liquidity dumps
+* Speculative “AI tokens” without real AI
+* Closed AI systems with no modular contribution model
 
-Normal tokens can also be launched without AI functionality.
+AgentLaunch introduces:
 
----
+* Verifiable AI-token linkage
+* Structured launch logic
+* Token-gated AI APIs
+* Modular skill architecture
+* Incentive alignment between builders, developers, and users
 
-## 🔹 Layer 3 — Launchpad Infrastructure
-
-Built-in support for:
-
-* Progressive Liquidity Unlock (PLU)
-* AMM Customization
-* Post-Launch Growth Tools
-* Analytics Dashboard
-* Reputation Scoring
+This shifts BNB Chain from speculative launches toward sustainable AI-native economies.
 
 ---
 
-# 🔥 Key Features
+# 🏗 Architecture Overview
+
+AgentLaunch combines:
+
+* Frontend (React / Next.js)
+* Backend (Node.js / Express)
+* Smart Contracts (ERC20 + Agent Registry)
+* NodeOps VM provisioning
+* Docker-based AI deployment
+
+High-level flow:
+
+User → Launch Token → Register Agent → Provision VM → Deploy AI → Token-Gated Access
+
+Detailed diagrams and architecture are available in `docs/TECHNICAL.md`.
 
 ---
 
-## 1️⃣ Progressive Liquidity Unlock (PLU)
+# 🔐 Core Features
 
-Liquidity unlocks gradually instead of all at once.
-
-Unlock conditions can include:
-
-* Time-based unlock
-* Volume milestones
-* Holder count milestones
-* Agent interaction milestones (AI-based unlock)
-
-This prevents dumps and encourages long-term growth.
+* ERC20 token deployment
+* On-chain agent registry
+* Token balance verification
+* Wallet signature validation
+* Docker-based AI agent runtime
+* NodeOps VM provisioning
+* Real-time activity updates
+* Modular skill extension framework
 
 ---
 
-## 2️⃣ Automated Market Making Customization
+# 📂 Repository Structure
 
-Creators can configure:
-
-* Initial price
-* Fee tiers
-* Dynamic fees
-* Anti-whale protection
-* Liquidity curve model
-
-Fully integrated with BNB AMM ecosystem.
-
----
-
-## 3️⃣ Post-Launch Growth Tools
-
-Each launched token receives:
-
-### 📊 Analytics Dashboard
-
-* Holder growth
-* Volume tracking
-* Liquidity tracking
-* Buy/Sell ratio
-* Whale concentration
-
-### 🔥 Buyback & Burn Module
-
-* Automatic treasury buybacks
-* Burn mechanisms
-* Supply control
-
-### 🎁 Incentive Engine
-
-* Airdrop scheduling
-* Referral tracking
-* Usage mining rewards
-
-### 🏆 Reputation Score
-
-Each token receives a health score based on:
-
-* Liquidity stability
-* Distribution fairness
-* Growth consistency
-* Agent activity
+```
+/README.md
+/bsc.address
+/docs/
+    PROJECT.md
+    TECHNICAL.md
+    EXTRAS.md
+/src/
+/test/
+```
 
 ---
 
-# 🤖 AI Agent Ecosystem
+# ⚙️ Quick Start (Local Development)
+
+## 1. Clone Repository
+
+```
+git clone <repo-url>
+cd agentlaunch
+```
+
+## 2. Install Dependencies
+
+```
+npm install
+```
+
+## 3. Configure Environment
+
+Create `.env` from `.env.example`:
+
+```
+PRIVATE_KEY=
+BSC_RPC_URL=
+NODEOPS_API_KEY=
+JWT_SECRET=
+PORT=4000
+```
 
 ---
 
-## 🧠 Agent Launch Flow
+## 4. Deploy Smart Contracts
 
-Developer:
+```
+npx hardhat run scripts/deploy.js --network bscTestnet
+```
 
-1. Launches AI Agent
-2. NFA is minted
-3. Logic contract attached
-4. Optional learning enabled
-5. Agent token deployed
-6. PLU + AMM configured
+Update `bsc.address` with deployed contract addresses.
 
 ---
 
-## 🧩 Skill Marketplace
+## 5. Start Backend
 
-Other developers can:
+```
+npm run backend
+```
 
-* Create Skill Tokens
-* Register them to specific agents
-* Define cost per usage
-* Monetize their AI modules
+Runs at:
 
-Example:
-
-ResearchAgent
-↳ $RESEARCH (main token)
-↳ $DEBUG (debug skill)
-↳ $RAG (retrieval skill)
-↳ $TRADE (trading skill)
+```
+http://localhost:4000
+```
 
 ---
 
-## 👤 User Flow
+## 6. Start Frontend
 
-1. User buys Agent Token
-2. User buys Skill Token
-3. User activates skill in dashboard
-4. Backend verifies token balance
-5. Skill logic integrates into agent
-6. Interaction processed
+```
+npm run dev
+```
 
----
+Open:
 
-# 🪙 Normal Token Launch Support
-
-AgentLaunch also supports standard token launches without AI.
-
-Creators can:
-
-* Launch simple fungible tokens
-* Configure PLU
-* Customize AMM
-* Access growth tools
-* Trade instantly
-
-AI layer is optional.
+```
+http://localhost:3000
+```
 
 ---
 
-# 🎨 Frontend Design
+# 🧪 How to Evaluate (5-Minute Judge Guide)
 
-Inspired by pump.fun:
+1. Open production link
+2. Connect MetaMask (BNB Testnet)
+3. Launch a sample agent
+4. Confirm token deployment on BscScan
+5. Test token-gated API access
 
-* Minimal UI
-* Clean token cards
-* Live trending feed
-* Simple launch form
-* One-click deploy
+Full setup and architecture details are in:
 
-But themed in BNB style:
-
-* Yellow accent (#F3BA2F)
-* Dark modern interface
-* High-contrast charts
-* Smooth animated liquidity bars
+* `docs/PROJECT.md`
+* `docs/TECHNICAL.md`
 
 ---
 
-# 🏗 Smart Contract Modules
+# 📜 Smart Contracts
 
-* TokenFactory
-* NFAManager
-* AgentRegistry
-* SkillRegistry
-* PLUVault
-* AMMManager
-* GrowthModule
-* ReputationEngine
+Contracts deployed on:
 
----
+* BNB Smart Chain Testnet
 
-# 🔐 Security
+See `bsc.address` for:
 
-* Circuit breaker system
-* Permissioned vault access
-* Learning update rate limits
-* Gas limits for delegatecalls
-* Signature verification for skill registration
-* Treasury-controlled buybacks
+* Token contract address
+* Agent registry contract
+* Explorer links
 
 ---
 
-# 🌱 Future Roadmap
+# 💼 Ecosystem Impact
 
-* Agent-to-Agent interactions
-* Autonomous treasury AI
-* Cross-agent liquidity competition
-* Cross-chain expansion
-* DAO-based governance
-* AI performance-based liquidity unlock
+AgentLaunch drives:
 
----
+* Increased smart contract deployments
+* AI-native token utility
+* On-chain verification of AI agents
+* Modular AI development markets
+* Sustainable liquidity models
 
-# 🏆 Why AgentLaunch
-
-Unlike typical launchpads:
-
-✔ Supports both AI agents and normal tokens
-✔ Integrates standardized NFA infrastructure
-✔ Enables modular skill economy
-✔ Combines PLU + AMM + Growth tools
-✔ Designed for sustainable token ecosystems
-
-AgentLaunch is not just a memecoin platform.
-
-It is intelligent token infrastructure for the AI era.
+It provides a foundation for programmable AI economies on BNB Chain.
 
 ---
 
-# 🛠 Tech Stack
+# 🔭 Roadmap
 
-Frontend:
+Short-Term:
 
-* Next.js
-* React
-* Tailwind CSS
-* Ethers.js / Web3.js
+* Automated skill registry
+* Revenue split contracts
+* Liquidity lock module
+* Analytics dashboard
 
-Backend:
+Long-Term:
 
-* Node.js / Express
-* AI API integration layer
-* Token verification middleware
-
-Smart Contracts:
-
-* Solidity
-* OpenZeppelin
-* BNB Chain Testnet deployment
+* Cross-chain AI agents
+* On-chain governance
+* Decentralized inference network
+* Reputation-based skill scoring
 
 ---
 
-# 📦 Deployment
+# 📽 Demo & Presentation
 
-1. Deploy smart contracts to BNB testnet
-2. Configure frontend RPC
-3. Deploy AI service backend
-4. Register initial agents
-5. Enable PLU vault logic
-6. Activate AMM pools
+Supporting materials are available in:
+
+`docs/EXTRAS.md`
+
+The repository and codebase are the primary source of truth for evaluation.
 
 ---
 
@@ -321,11 +247,3 @@ Smart Contracts:
 MIT License
 
 ---
-
-# 🟡 Final Statement
-
-AgentLaunch builds the economic layer for autonomous AI agents and programmable tokens on BNB Chain.
-
-Simple to launch.
-Structured to grow.
-Built for the future.
